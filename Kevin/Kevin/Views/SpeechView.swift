@@ -236,6 +236,8 @@ struct SpeechView: View {
                 videoURL: selectedVideoForTranscription,
                 speechRecognizer: speechRecognizer
             )
+            .frame(minWidth: 800, minHeight: 600)
+            .presentationDetents([.large])
         }
     }
     
@@ -259,36 +261,43 @@ struct TranscriptionView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                // Header with controls
-                HStack {
-                    if let url = videoURL {
-                        Button("Retry") {
-                            speechRecognizer.transcribeVideo(url: url)
-                        }
-                        .disabled(speechRecognizer.isTranscribing)
+        VStack(spacing: 0) {
+            // Header with controls
+            HStack {
+                if let url = videoURL {
+                    Button("Retry") {
+                        speechRecognizer.transcribeVideo(url: url)
                     }
-                    
-                    Spacer()
-                    
-                    Text("Speech Transcription")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    Spacer()
-                    
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .buttonStyle(.borderedProminent)
+                    .disabled(speechRecognizer.isTranscribing)
+                    .buttonStyle(.bordered)
                 }
-                .padding()
                 
+                Spacer()
+                
+                Text("Speech Transcription")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                Spacer()
+                
+                Button("Done") {
+                    dismiss()
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 16)
+            .background(Color(NSColor.controlBackgroundColor))
+            
+            Divider()
+            
+            // Content area
+            VStack(spacing: 20) {
                 if let url = videoURL {
                     Text("Recording: \(url.lastPathComponent)")
                         .font(.headline)
                         .foregroundColor(.secondary)
+                        .padding(.top, 16)
                 }
                 
                 ScrollView {
@@ -301,7 +310,8 @@ struct TranscriptionView: View {
                                     .font(.body)
                                     .foregroundColor(.secondary)
                             }
-                            .padding()
+                            .padding(16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .background(Color.blue.opacity(0.1))
                             .cornerRadius(10)
                         }
@@ -312,12 +322,18 @@ struct TranscriptionView: View {
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                 
-                                Text(speechRecognizer.transcriptionText)
-                                    .font(.body)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.1))
-                                    .cornerRadius(10)
-                                    .textSelection(.enabled)
+                                ScrollView {
+                                    Text(speechRecognizer.transcriptionText)
+                                        .font(.body)
+                                        .padding(16)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(10)
+                                        .textSelection(.enabled)
+                                }
+                                .frame(minHeight: 200, maxHeight: 400)
+                                .background(Color.gray.opacity(0.05))
+                                .cornerRadius(10)
                             }
                         }
                         
@@ -330,27 +346,42 @@ struct TranscriptionView: View {
                                 
                                 Text(error)
                                     .font(.body)
-                                    .padding()
+                                    .padding(16)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                     .background(Color.red.opacity(0.1))
                                     .cornerRadius(10)
                             }
                         }
                         
                         if !speechRecognizer.isTranscribing && speechRecognizer.transcriptionText.isEmpty && speechRecognizer.transcriptionError == nil {
-                            Text("Tap 'Transcribe' to convert the audio to text.")
-                                .font(.body)
-                                .foregroundColor(.secondary)
-                                .padding()
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(10)
+                            VStack(spacing: 16) {
+                                Image(systemName: "waveform.and.mic")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(.secondary)
+                                
+                                Text("Ready to transcribe")
+                                    .font(.title2)
+                                    .fontWeight(.medium)
+                                
+                                Text("Tap 'Transcribe' to convert the audio from your recording to text.")
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding(32)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(10)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 24)
                 }
-                
-                Spacer()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .frame(minWidth: 800, minHeight: 600)
+        .background(Color(NSColor.windowBackgroundColor))
     }
 }
 
