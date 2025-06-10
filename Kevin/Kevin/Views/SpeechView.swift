@@ -8,10 +8,14 @@
 import SwiftUI
 import AVFoundation
 import AVKit
+import Speech
 
 struct SpeechView: View {
     @StateObject private var cameraManager = CameraManager()
+    @StateObject private var speechRecognizer = SpeechRecognizer()
     @State private var showingVideoPlayer = false
+    @State private var showingTranscriptionView = false
+    @State private var selectedVideoForTranscription: URL?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -178,6 +182,16 @@ struct SpeechView: View {
                                         .buttonStyle(.borderedProminent)
                                         .controlSize(.small)
                                         
+                                        Button("Transcribe") {
+                                            selectedVideoForTranscription = url
+                                            showingTranscriptionView = true
+                                            speechRecognizer.transcribeVideo(url: url)
+                                        }
+                                        .buttonStyle(.bordered)
+                                        .controlSize(.small)
+                                        .foregroundColor(.blue)
+                                        .disabled(speechRecognizer.isTranscribing)
+                                        
                                         Button("Delete") {
                                             cameraManager.deleteRecording(url: url)
                                             // If we're currently playing the deleted video, go back to camera
@@ -207,6 +221,7 @@ struct SpeechView: View {
         }
         .onAppear {
             cameraManager.setupCamera()
+            speechRecognizer.requestPermissions()
         }
         .onDisappear {
             cameraManager.stopSession()
@@ -215,6 +230,12 @@ struct SpeechView: View {
             if cameraManager.lastRecordedVideoURL != nil && !cameraManager.isRecording {
                 showingVideoPlayer = true
             }
+        }
+        .sheet(isPresented: $showingTranscriptionView) {
+            TranscriptionView(
+                videoURL: selectedVideoForTranscription,
+                speechRecognizer: speechRecognizer
+            )
         }
     }
     
@@ -228,6 +249,164 @@ struct SpeechView: View {
             return formatter.string(from: date)
         }
         return "Unknown date"
+    }
+}
+
+// Transcription View
+struct TranscriptionView: View {
+    let videoURL: URL?
+    @ObservedObject var speechRecognizer: SpeechRecognizer
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                // Header with controls
+                HStack {
+                    if let url = videoURL {
+                        Button("Retry") {
+                            speechRecognizer.transcribeVideo(url: url)
+                        }
+                        .disabled(speechRecognizer.isTranscribing)
+                    }
+                    
+                    Spacer()
+                    
+                    Text("Speech Transcription")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    
+                    Spacer()
+                    
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding()
+                
+                if let url = videoURL {
+                    Text("Recording: \(url.lastPathComponent)")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                }
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        if speechRecognizer.isTranscribing {
+                            HStack {
+                                ProgressView()
+                                    .controlSize(.small)
+                                Text("Transcribing audio...")
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding()
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(10)
+                        }
+                        
+                        if !speechRecognizer.transcriptionText.isEmpty {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Transcription:")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                
+                                Text(speechRecognizer.transcriptionText)
+                                    .font(.body)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.1))
+                                    .cornerRadius(10)
+                                    .textSelection(.enabled)
+                            }
+                        }
+                        
+                        if let error = speechRecognizer.transcriptionError {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Error:")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.red)
+                                
+                                Text(error)
+                                    .font(.body)
+                                    .padding()
+                                    .background(Color.red.opacity(0.1))
+                                    .cornerRadius(10)
+                            }
+                        }
+                        
+                        if !speechRecognizer.isTranscribing && speechRecognizer.transcriptionText.isEmpty && speechRecognizer.transcriptionError == nil {
+                            Text("Tap 'Transcribe' to convert the audio to text.")
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                                .padding()
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(10)
+                        }
+                    }
+                    .padding()
+                }
+                
+                Spacer()
+            }
+        }
+    }
+}
+
+// Speech Recognizer Class
+class SpeechRecognizer: ObservableObject {
+    @Published var transcriptionText = ""
+    @Published var isTranscribing = false
+    @Published var transcriptionError: String?
+    
+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+    
+    func requestPermissions() {
+        SFSpeechRecognizer.requestAuthorization { status in
+            DispatchQueue.main.async {
+                switch status {
+                case .authorized:
+                    print("Speech recognition authorized")
+                case .denied, .restricted, .notDetermined:
+                    print("Speech recognition not authorized")
+                @unknown default:
+                    print("Unknown speech recognition status")
+                }
+            }
+        }
+    }
+    
+    func transcribeVideo(url: URL) {
+        guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
+            transcriptionError = "Speech recognition not available"
+            return
+        }
+        
+        isTranscribing = true
+        transcriptionText = ""
+        transcriptionError = nil
+        
+        let request = SFSpeechURLRecognitionRequest(url: url)
+        request.shouldReportPartialResults = false
+        
+        speechRecognizer.recognitionTask(with: request) { [weak self] result, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    self?.transcriptionError = error.localizedDescription
+                    self?.isTranscribing = false
+                    return
+                }
+                
+                if let result = result {
+                    self?.transcriptionText = result.bestTranscription.formattedString
+                    
+                    if result.isFinal {
+                        self?.isTranscribing = false
+                    }
+                }
+            }
+        }
     }
 }
 
