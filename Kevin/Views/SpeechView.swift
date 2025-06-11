@@ -8,11 +8,9 @@
 import SwiftUI
 import AVFoundation
 import AVKit
-import Speech
 
 struct SpeechView: View {
-    @StateObject private var cameraManager = CameraManager()
-    @StateObject private var speechRecognizer = SpeechRecognizer()
+    @StateObject private var viewModel = SpeechViewModel() // Use the new ViewModel
     @State private var showingVideoPlayer = false
     @State private var showingTranscriptionView = false
     @State private var selectedVideoForTranscription: URL?
@@ -27,14 +25,14 @@ struct SpeechView: View {
             
             // Video preview area
             ZStack {
-                if showingVideoPlayer, let videoURL = cameraManager.lastRecordedVideoURL {
+                if showingVideoPlayer, let videoURL = viewModel.lastRecordedVideoURL {
                     // Video player for recorded video
                     VideoPlayer(player: AVPlayer(url: videoURL))
                         .frame(height: 400)
                         .cornerRadius(15)
                 } else {
                     // Camera preview
-                    CameraPreview(session: cameraManager.session)
+                    CameraPreview(session: viewModel.session) // Use session from ViewModel
                         .frame(height: 400)
                         .cornerRadius(15)
                         .overlay(
@@ -44,7 +42,7 @@ struct SpeechView: View {
                 }
                 
                 // Overlay message when no camera access
-                if !cameraManager.hasPermissions {
+                if !viewModel.hasCameraPermissions {
                     VStack {
                         Image(systemName: "camera.fill")
                             .font(.system(size: 50))
@@ -52,6 +50,11 @@ struct SpeechView: View {
                         Text("Camera access required")
                             .font(.headline)
                             .foregroundColor(.gray)
+                        Text("Please grant camera and microphone access in Settings.")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.black.opacity(0.1))
@@ -60,43 +63,45 @@ struct SpeechView: View {
             }
             
             // Status text
-            Text(cameraManager.isRecording ? "Recording in progress..." : 
-                 showingVideoPlayer ? "Playing recorded video" : "Ready to record")
+            Text(viewModel.isRecording ? "Recording in progress..." :
+                 showingVideoPlayer && viewModel.lastRecordedVideoURL != nil ? "Playing recorded video" : "Ready to record")
                 .font(.headline)
-                .foregroundColor(cameraManager.isRecording ? .red : 
-                               showingVideoPlayer ? .blue : .primary)
+                .foregroundColor(viewModel.isRecording ? .red :
+                               (showingVideoPlayer && viewModel.lastRecordedVideoURL != nil) ? .blue : .primary)
             
             // Control buttons
             HStack(spacing: 30) {
                 // Record/Stop button
                 Button(action: {
-                    if cameraManager.isRecording {
-                        cameraManager.stopRecording()
+                    if viewModel.isRecording {
+                        viewModel.stopRecording()
                     } else {
-                        showingVideoPlayer = false
-                        cameraManager.startRecording()
+                        showingVideoPlayer = false // Switch back to camera view if playing
+                        viewModel.lastRecordedVideoURL = nil // Clear last played video to ensure camera shows
+                        viewModel.startRecording()
                     }
                 }) {
                     VStack {
                         Circle()
-                            .fill(cameraManager.isRecording ? Color.red : Color.blue)
+                            .fill(viewModel.isRecording ? Color.red : Color.blue)
                             .frame(width: 80, height: 80)
                             .overlay(
-                                Image(systemName: cameraManager.isRecording ? "stop.fill" : "record.circle")
+                                Image(systemName: viewModel.isRecording ? "stop.fill" : "record.circle")
                                     .foregroundColor(.white)
                                     .font(.title)
                             )
-                        Text(cameraManager.isRecording ? "Stop" : "Record")
+                        Text(viewModel.isRecording ? "Stop" : "Record")
                             .font(.caption)
                             .fontWeight(.medium)
                     }
                 }
-                .disabled(!cameraManager.hasPermissions)
+                .disabled(!viewModel.hasCameraPermissions)
                 
                 // Back to camera button (only show when playing video)
-                if showingVideoPlayer {
+                if showingVideoPlayer && viewModel.lastRecordedVideoURL != nil {
                     Button(action: {
                         showingVideoPlayer = false
+                        // viewModel.lastRecordedVideoURL = nil // Optional: clear to ensure camera preview
                     }) {
                         VStack {
                             Circle()
@@ -115,10 +120,10 @@ struct SpeechView: View {
                 }
                 
                 // Play latest button (only show when not recording and has recordings)
-                if !cameraManager.isRecording && !cameraManager.recordedVideos.isEmpty && !showingVideoPlayer {
+                if !viewModel.isRecording && !viewModel.recordedVideos.isEmpty && !showingVideoPlayer {
                     Button(action: {
-                        if let latestVideo = cameraManager.recordedVideos.last {
-                            cameraManager.lastRecordedVideoURL = latestVideo
+                        if let latestVideo = viewModel.recordedVideos.first { // Assuming sorted newest first
+                            viewModel.lastRecordedVideoURL = latestVideo
                             showingVideoPlayer = true
                         }
                     }) {
@@ -141,7 +146,7 @@ struct SpeechView: View {
             .padding()
             
             // Recording history
-            if !cameraManager.recordedVideos.isEmpty {
+            if !viewModel.recordedVideos.isEmpty {
                 VStack(alignment: .leading) {
                     HStack {
                         Text("Previous Recordings")
@@ -150,7 +155,7 @@ struct SpeechView: View {
                         Spacer()
                         
                         Button("Delete All") {
-                            cameraManager.deleteAllRecordings()
+                            viewModel.deleteAllRecordings()
                             showingVideoPlayer = false
                         }
                         .buttonStyle(.bordered)
@@ -161,10 +166,13 @@ struct SpeechView: View {
                     
                     ScrollView {
                         LazyVStack {
-                            ForEach(Array(cameraManager.recordedVideos.enumerated().reversed()), id: \.offset) { index, url in
+                            // Iterating directly over viewModel.recordedVideos as it's now sorted
+                            ForEach(viewModel.recordedVideos, id: \.self) { url in
                                 HStack {
                                     VStack(alignment: .leading) {
-                                        Text("Recording \(cameraManager.recordedVideos.count - index)")
+                                        // Find index for display name if needed, or use a more robust model
+                                        let index = viewModel.recordedVideos.firstIndex(of: url) ?? -1
+                                        Text("Recording \(viewModel.recordedVideos.count - index)")
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                         Text(formatDate(from: url))
@@ -176,7 +184,7 @@ struct SpeechView: View {
                                     
                                     HStack(spacing: 10) {
                                         Button("Play") {
-                                            cameraManager.lastRecordedVideoURL = url
+                                            viewModel.lastRecordedVideoURL = url
                                             showingVideoPlayer = true
                                         }
                                         .buttonStyle(.borderedProminent)
@@ -185,19 +193,20 @@ struct SpeechView: View {
                                         Button("Transcribe") {
                                             selectedVideoForTranscription = url
                                             showingTranscriptionView = true
-                                            speechRecognizer.transcribeVideo(url: url)
+                                            // Transcription is now triggered from TranscriptionView's onAppear or a button there
+                                            // viewModel.transcribeVideo(url: url) // Or trigger here if preferred
                                         }
                                         .buttonStyle(.bordered)
                                         .controlSize(.small)
                                         .foregroundColor(.blue)
-                                        .disabled(speechRecognizer.isTranscribing)
+                                        .disabled(viewModel.isTranscribing)
                                         
                                         Button("Delete") {
-                                            cameraManager.deleteRecording(url: url)
-                                            // If we're currently playing the deleted video, go back to camera
-                                            if cameraManager.lastRecordedVideoURL == url {
-                                                showingVideoPlayer = false
-                                                cameraManager.lastRecordedVideoURL = nil
+                                            viewModel.deleteRecording(url: url)
+                                            // If we're currently playing the deleted video, go back to camera or play next/previous
+                                            if viewModel.lastRecordedVideoURL == url { // This condition might be tricky if url is already deleted
+                                                showingVideoPlayer = false // Go back to camera view
+                                                // viewModel.lastRecordedVideoURL = viewModel.recordedVideos.first // Play newest
                                             }
                                         }
                                         .buttonStyle(.bordered)
@@ -220,21 +229,23 @@ struct SpeechView: View {
             Spacer()
         }
         .onAppear {
-            cameraManager.setupCamera()
-            speechRecognizer.requestPermissions()
+            viewModel.setupCamera() // This now handles both camera and speech permissions
+            viewModel.loadRecordings()
         }
         .onDisappear {
-            cameraManager.stopSession()
+            viewModel.stopSession()
         }
-        .onChange(of: cameraManager.lastRecordedVideoURL) { _ in
-            if cameraManager.lastRecordedVideoURL != nil && !cameraManager.isRecording {
+        .onChange(of: viewModel.lastRecordedVideoURL) { oldValue, newValue in
+            if newValue != nil && !viewModel.isRecording {
                 showingVideoPlayer = true
+            } else if newValue == nil {
+                showingVideoPlayer = false
             }
         }
         .sheet(isPresented: $showingTranscriptionView) {
             TranscriptionView(
                 videoURL: selectedVideoForTranscription,
-                speechRecognizer: speechRecognizer
+                viewModel: viewModel // Pass the viewModel
             )
             .frame(minWidth: 800, minHeight: 600)
             .presentationDetents([.large])
@@ -246,18 +257,18 @@ struct SpeechView: View {
         if let timeInterval = Double(filename.replacingOccurrences(of: "recording_", with: "").replacingOccurrences(of: ".mov", with: "")) {
             let date = Date(timeIntervalSince1970: timeInterval)
             let formatter = DateFormatter()
-            formatter.dateStyle = .short
+            formatter.dateStyle = .medium
             formatter.timeStyle = .short
             return formatter.string(from: date)
         }
-        return "Unknown date"
+        return url.lastPathComponent // Fallback to filename
     }
 }
 
 // Transcription View
 struct TranscriptionView: View {
     let videoURL: URL?
-    @ObservedObject var speechRecognizer: SpeechRecognizer
+    @ObservedObject var viewModel: SpeechViewModel // Use SpeechViewModel
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -265,10 +276,10 @@ struct TranscriptionView: View {
             // Header with controls
             HStack {
                 if let url = videoURL {
-                    Button("Retry") {
-                        speechRecognizer.transcribeVideo(url: url)
+                    Button("Retry Transcription") {
+                        viewModel.transcribeVideo(url: url)
                     }
-                    .disabled(speechRecognizer.isTranscribing)
+                    .disabled(viewModel.isTranscribing)
                     .buttonStyle(.bordered)
                 }
                 
@@ -287,7 +298,7 @@ struct TranscriptionView: View {
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
-            .background(Color(NSColor.controlBackgroundColor))
+            .background(Color(NSColor.controlBackgroundColor)) // Adapts to light/dark mode
             
             Divider()
             
@@ -302,7 +313,7 @@ struct TranscriptionView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        if speechRecognizer.isTranscribing {
+                        if viewModel.isTranscribing {
                             HStack {
                                 ProgressView()
                                     .controlSize(.small)
@@ -316,14 +327,14 @@ struct TranscriptionView: View {
                             .cornerRadius(10)
                         }
                         
-                        if !speechRecognizer.transcriptionText.isEmpty {
+                        if !viewModel.transcriptionText.isEmpty {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Transcription:")
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                 
                                 ScrollView {
-                                    Text(speechRecognizer.transcriptionText)
+                                    Text(viewModel.transcriptionText)
                                         .font(.body)
                                         .padding(16)
                                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -331,13 +342,13 @@ struct TranscriptionView: View {
                                         .cornerRadius(10)
                                         .textSelection(.enabled)
                                 }
-                                .frame(minHeight: 200, maxHeight: 400)
+                                .frame(minHeight: 100, maxHeight: .infinity) // Allow it to grow
                                 .background(Color.gray.opacity(0.05))
                                 .cornerRadius(10)
                             }
                         }
                         
-                        if let error = speechRecognizer.transcriptionError {
+                        if let error = viewModel.transcriptionError {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Error:")
                                     .font(.headline)
@@ -353,8 +364,8 @@ struct TranscriptionView: View {
                             }
                         }
                         
-                        if !speechRecognizer.isTranscribing && speechRecognizer.transcriptionText.isEmpty && speechRecognizer.transcriptionError == nil {
-                            VStack(spacing: 16) {
+                        if !viewModel.isTranscribing && viewModel.transcriptionText.isEmpty && viewModel.transcriptionError == nil {
+                             VStack(spacing: 16) {
                                 Image(systemName: "waveform.and.mic")
                                     .font(.system(size: 48))
                                     .foregroundColor(.secondary)
@@ -363,10 +374,17 @@ struct TranscriptionView: View {
                                     .font(.title2)
                                     .fontWeight(.medium)
                                 
-                                Text("Tap 'Transcribe' to convert the audio from your recording to text.")
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
+                                if videoURL != nil {
+                                     Text("Tap 'Retry Transcription' to convert the audio from your recording to text, or it will start automatically if triggered from the main view.")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
+                                } else {
+                                    Text("No video selected for transcription.")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
+                                }
                             }
                             .padding(32)
                             .frame(maxWidth: .infinity)
@@ -381,67 +399,17 @@ struct TranscriptionView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(minWidth: 800, minHeight: 600)
-        .background(Color(NSColor.windowBackgroundColor))
-    }
-}
-
-// Speech Recognizer Class
-class SpeechRecognizer: ObservableObject {
-    @Published var transcriptionText = ""
-    @Published var isTranscribing = false
-    @Published var transcriptionError: String?
-    
-    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
-    
-    func requestPermissions() {
-        SFSpeechRecognizer.requestAuthorization { status in
-            DispatchQueue.main.async {
-                switch status {
-                case .authorized:
-                    print("Speech recognition authorized")
-                case .denied, .restricted, .notDetermined:
-                    print("Speech recognition not authorized")
-                @unknown default:
-                    print("Unknown speech recognition status")
-                }
-            }
-        }
-    }
-    
-    func transcribeVideo(url: URL) {
-        guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
-            transcriptionError = "Speech recognition not available"
-            return
-        }
-        
-        isTranscribing = true
-        transcriptionText = ""
-        transcriptionError = nil
-        
-        let request = SFSpeechURLRecognitionRequest(url: url)
-        request.shouldReportPartialResults = false
-        
-        speechRecognizer.recognitionTask(with: request) { [weak self] result, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    self?.transcriptionError = error.localizedDescription
-                    self?.isTranscribing = false
-                    return
-                }
-                
-                if let result = result {
-                    self?.transcriptionText = result.bestTranscription.formattedString
-                    
-                    if result.isFinal {
-                        self?.isTranscribing = false
-                    }
-                }
+        .background(Color(NSColor.windowBackgroundColor)) // Adapts to light/dark mode
+        .onAppear {
+            // Automatically start transcription if a videoURL is provided and not already transcribing
+            if let url = videoURL, !viewModel.isTranscribing, viewModel.transcriptionText.isEmpty {
+                viewModel.transcribeVideo(url: url)
             }
         }
     }
 }
 
-// Camera Preview NSViewRepresentable
+// Camera Preview NSViewRepresentable (No changes needed, it takes AVCaptureSession)
 struct CameraPreview: NSViewRepresentable {
     let session: AVCaptureSession
     
@@ -450,7 +418,8 @@ struct CameraPreview: NSViewRepresentable {
         view.wantsLayer = true
         
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.videoGravity = .resizeAspectFill
+        previewLayer.videoGravity = .resizeAspectFill // Changed to fill for better preview
+        previewLayer.frame = view.bounds // Set initial frame
         view.layer = previewLayer
         
         return view
@@ -458,156 +427,20 @@ struct CameraPreview: NSViewRepresentable {
     
     func updateNSView(_ nsView: NSView, context: Context) {
         if let layer = nsView.layer as? AVCaptureVideoPreviewLayer {
-            layer.session = session
+            layer.session = session // Ensure session is up to date
             
-            // Update layer frame to match view bounds
-            DispatchQueue.main.async {
-                layer.frame = nsView.bounds
+            // Update layer frame to match view bounds on resize
+            DispatchQueue.main.async { // Ensure UI updates on main thread
+                 if layer.frame != nsView.bounds {
+                    layer.frame = nsView.bounds
+                }
             }
         }
     }
 }
 
-// Camera Manager
-class CameraManager: NSObject, ObservableObject {
-    @Published var isRecording = false
-    @Published var lastRecordedVideoURL: URL?
-    @Published var recordedVideos: [URL] = []
-    @Published var hasPermissions = false
-    
-    let session = AVCaptureSession()
-    private var movieFileOutput = AVCaptureMovieFileOutput()
-    
-    func setupCamera() {
-        checkPermissions()
-    }
-    
-    private func checkPermissions() {
-        AVCaptureDevice.requestAccess(for: .video) { [weak self] videoGranted in
-            if videoGranted {
-                AVCaptureDevice.requestAccess(for: .audio) { [weak self] audioGranted in
-                    DispatchQueue.main.async {
-                        self?.hasPermissions = videoGranted && audioGranted
-                        if self?.hasPermissions == true {
-                            self?.configureSession()
-                        }
-                    }
-                }
-            } else {
-                DispatchQueue.main.async {
-                    self?.hasPermissions = false
-                }
-            }
-        }
-    }
-    
-    private func configureSession() {
-        session.beginConfiguration()
-        
-        // Set session preset for better quality
-        if session.canSetSessionPreset(.high) {
-            session.sessionPreset = .high
-        }
-        
-        // Add video input
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
-              let videoInput = try? AVCaptureDeviceInput(device: videoDevice) else {
-            session.commitConfiguration()
-            return
-        }
-        
-        if session.canAddInput(videoInput) {
-            session.addInput(videoInput)
-        }
-        
-        // Add audio input
-        guard let audioDevice = AVCaptureDevice.default(for: .audio),
-              let audioInput = try? AVCaptureDeviceInput(device: audioDevice) else {
-            session.commitConfiguration()
-            return
-        }
-        
-        if session.canAddInput(audioInput) {
-            session.addInput(audioInput)
-        }
-        
-        // Add movie file output
-        if session.canAddOutput(movieFileOutput) {
-            session.addOutput(movieFileOutput)
-        }
-        
-        session.commitConfiguration()
-        
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.session.startRunning()
-        }
-    }
-    
-    func startRecording() {
-        guard !isRecording && hasPermissions else { return }
-        
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let outputURL = documentsPath.appendingPathComponent("recording_\(Date().timeIntervalSince1970).mov")
-        
-        movieFileOutput.startRecording(to: outputURL, recordingDelegate: self)
-        isRecording = true
-    }
-    
-    func stopRecording() {
-        guard isRecording else { return }
-        movieFileOutput.stopRecording()
-        isRecording = false
-    }
-    
-    func stopSession() {
-        session.stopRunning()
-    }
-    
-    func deleteRecording(url: URL) {
-        // Remove from file system
-        do {
-            try FileManager.default.removeItem(at: url)
-            print("Successfully deleted recording: \(url)")
-        } catch {
-            print("Error deleting recording: \(error.localizedDescription)")
-        }
-        
-        // Remove from array
-        recordedVideos.removeAll { $0 == url }
-        
-        // Update lastRecordedVideoURL if it was the deleted one
-        if lastRecordedVideoURL == url {
-            lastRecordedVideoURL = recordedVideos.last
-        }
-    }
-    
-    func deleteAllRecordings() {
-        for url in recordedVideos {
-            do {
-                try FileManager.default.removeItem(at: url)
-            } catch {
-                print("Error deleting recording \(url): \(error.localizedDescription)")
-            }
-        }
-        recordedVideos.removeAll()
-        lastRecordedVideoURL = nil
-    }
-}
 
-// AVCaptureFileOutputRecordingDelegate
-extension CameraManager: AVCaptureFileOutputRecordingDelegate {
-    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
-        DispatchQueue.main.async {
-            if let error = error {
-                print("Recording error: \(error.localizedDescription)")
-            } else {
-                print("Recording saved to: \(outputFileURL)")
-                self.lastRecordedVideoURL = outputFileURL
-                self.recordedVideos.append(outputFileURL)
-            }
-        }
-    }
-}
+// Removed CameraManager and SpeechRecognizer classes as their logic is now in SpeechViewModel
 
 #Preview {
     SpeechView()
