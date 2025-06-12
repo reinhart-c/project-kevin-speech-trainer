@@ -11,11 +11,13 @@ import AVKit
 
 struct SpeechView: View {
     @StateObject private var speechViewModel = SpeechViewModel()
-    @StateObject private var prompterViewModel = PrompterViewModel() // Instantiate PrompterViewModel
+    @StateObject private var prompterViewModel = PrompterViewModel()
+    @StateObject private var resultViewModel = ResultViewModel() // Add ResultViewModel
 
     @State private var showingVideoPlayer = false
     @State private var showingTranscriptionView = false
     @State private var selectedVideoForTranscription: URL?
+    @State private var showingResult = false // Add state for showing result
     
     var body: some View {
         VStack(spacing: 20) {
@@ -32,7 +34,7 @@ struct SpeechView: View {
                             .aspectRatio(16/9, contentMode: .fit)
                             .cornerRadius(15)
                     } else {
-                        CameraPreview(session: speechViewModel.session) // Use session from ViewModel
+                        CameraPreview(session: speechViewModel.session)
                             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                             .aspectRatio(16/9, contentMode: .fit)
                             .cornerRadius(15)
@@ -63,7 +65,19 @@ struct SpeechView: View {
                 }
                 .frame(height: 400)
 
-                PrompterView(viewModel: prompterViewModel) 
+                // Show ResultView instead of PrompterView when recording is finished and we have results
+                if showingResult {
+                    ResultView(viewModel: resultViewModel) {
+                        // Reset action
+                        showingResult = false
+                        resultViewModel.reset()
+                        prompterViewModel.resetHighlighting()
+                        speechViewModel.transcriptionText = ""
+                        speechViewModel.transcriptionError = nil
+                    }
+                } else {
+                    PrompterView(viewModel: prompterViewModel)
+                }
             }
             .padding(.horizontal)
             
@@ -71,17 +85,16 @@ struct SpeechView: View {
                  showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil ? "Playing recorded video" : "Ready to record")
                 .font(.headline)
                 .foregroundColor(speechViewModel.isRecording ? .red :
-                               (showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil) ? .blue : .primary) // Corrected variable name
+                               (showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil) ? .blue : .primary)
             
             HStack(spacing: 30) {
                 Button(action: {
                     if speechViewModel.isRecording {
                         speechViewModel.stopRecording()
                         prompterViewModel.stopHighlighting()
-                        // Consider if you want to immediately show the camera or the video player after stopping
-                        // showingVideoPlayer = false // This was present, decide if still needed
-                        // speechViewModel.lastRecordedVideoURL = nil // This might clear the URL before it can be used
                     } else {
+                        showingResult = false // Hide result when starting new recording
+                        resultViewModel.reset()
                         prompterViewModel.resetHighlighting()
                         prompterViewModel.startHighlighting()
                         speechViewModel.startRecording()
@@ -126,7 +139,7 @@ struct SpeechView: View {
                
                 if !speechViewModel.isRecording && !speechViewModel.recordedVideos.isEmpty && !showingVideoPlayer {
                     Button(action: {
-                        if let latestVideo = speechViewModel.recordedVideos.first { // Assuming sorted newest first
+                        if let latestVideo = speechViewModel.recordedVideos.first {
                             speechViewModel.lastRecordedVideoURL = latestVideo
                             showingVideoPlayer = true
                         }
@@ -240,11 +253,31 @@ struct SpeechView: View {
                 showingVideoPlayer = false
             }
         }
-        .onChange(of: prompterViewModel.prompterHasFinished) { oldValue, newValue in // New: Observe prompter state
+        .onChange(of: prompterViewModel.prompterHasFinished) { oldValue, newValue in
+            print("📝 Prompter finished changed from \(oldValue) to \(newValue)")
             if newValue == true && speechViewModel.isRecording {
-                print("Prompter has finished. Stopping recording.")
+                print("📝 Prompter has finished. Stopping recording.")
                 speechViewModel.stopRecording()
                }
+        }
+        // REMOVE the previous .onChange(of: speechViewModel.transcriptionText) that sets showingResult
+
+        // REVISED: Rely primarily on isTranscribing finishing AFTER recording has stopped
+        .onChange(of: speechViewModel.isTranscribing) { oldValue, newValue in
+            // newValue is the new state of isTranscribing
+            print("🔄 isTranscribing changed from \(oldValue) to \(newValue)")
+            print("📊 current transcriptionText: '\(speechViewModel.transcriptionText)'")
+            print("🎬 current isRecording: \(speechViewModel.isRecording)")
+            
+            // When transcription stops (newValue is false) AND recording has already stopped
+            if !newValue && !speechViewModel.isRecording {
+                print("🎯 Transcription finished and recording is stopped. Calculating score and showing result.")
+                resultViewModel.calculateScore(
+                    transcribedText: speechViewModel.transcriptionText, // This can be empty
+                    expectedText: prompterViewModel.prompter.script
+                )
+                showingResult = true
+            }
         }
         .sheet(isPresented: $showingTranscriptionView) {
             TranscriptionView(
