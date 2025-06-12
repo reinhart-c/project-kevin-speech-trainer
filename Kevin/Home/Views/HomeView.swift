@@ -2,16 +2,16 @@
 //  HomeView.swift
 //  Kevin
 //
-//  Created by Vincent Wisnata on 10/06/25.
+//  Created by Teuku Fazariz Basya on 10/06/25.
 //
 
 import SwiftUI
 
-struct ResultViewModel: View {
+struct HomeView: View {
     var body: some View {
         NavigationView {
             NavigationLink(destination: SpeechView()) {
-                Text("Hello, this is a Result View!")
+                Text("Hello, Kevin!")
             }
         }
     }
