@@ -160,12 +160,12 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             self.isRecording = false
             if let error = error {
                 print("Recording error: \(error.localizedDescription)")
-                // Optionally publish error to UI
             } else {
                 print("Recording saved to: \(outputFileURL)")
                 self.lastRecordedVideoURL = outputFileURL
                 self.recordedVideos.append(outputFileURL)
                 self.sortRecordings()
+                self.transcribeVideo(url: outputFileURL) 
             }
         }
     }

@@ -24,43 +24,50 @@ struct SpeechView: View {
                 .padding(.top)
             
             // Video preview area
-            ZStack {
-                if showingVideoPlayer, let videoURL = viewModel.lastRecordedVideoURL {
-                    // Video player for recorded video
-                    VideoPlayer(player: AVPlayer(url: videoURL))
-                        .frame(height: 400)
-                        .cornerRadius(15)
-                } else {
-                    // Camera preview
-                    CameraPreview(session: viewModel.session) // Use session from ViewModel
-                        .frame(height: 400)
-                        .cornerRadius(15)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 2)
-                        )
-                }
-                
-                // Overlay message when no camera access
-                if !viewModel.hasCameraPermissions {
-                    VStack {
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 50))
-                            .foregroundColor(.gray)
-                        Text("Camera access required")
-                            .font(.headline)
-                            .foregroundColor(.gray)
-                        Text("Please grant camera and microphone access in Settings.")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+            HStack {
+                ZStack {
+                    if showingVideoPlayer, let videoURL = viewModel.lastRecordedVideoURL {
+                        // Video player for recorded video
+                        VideoPlayer(player: AVPlayer(url: videoURL))
+                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                            .aspectRatio(16/9, contentMode: .fit)
+                            .cornerRadius(15)
+                    } else {
+                        // Camera preview
+                        CameraPreview(session: viewModel.session) // Use session from ViewModel
+                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                            .aspectRatio(16/9, contentMode: .fit)
+                            .cornerRadius(15)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 2)
+                            )
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.1))
-                    .cornerRadius(15)
+                    
+                    // Overlay message when no camera access
+                    if !viewModel.hasCameraPermissions {
+                        VStack {
+                            Image(systemName: "camera.fill")
+                                .font(.system(size: 50))
+                                .foregroundColor(.gray)
+                            Text("Camera access required")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                            Text("Please grant camera and microphone access in Settings.")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.1))
+                        .cornerRadius(15)
+                    }
                 }
+                .frame(height: 400)
+                PrompterView()
             }
+            .padding(.horizontal)
             
             // Status text
             Text(viewModel.isRecording ? "Recording in progress..." :
