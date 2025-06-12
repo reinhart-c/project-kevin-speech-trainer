@@ -9,6 +9,7 @@ import SwiftUI
 import AVFoundation
 import Speech
 import Combine
+import CoreML
 
 class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingDelegate {
     // MARK: - Published Properties from CameraManager
@@ -22,7 +23,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     @Published var isTranscribing = false
     @Published var transcriptionError: String?
     @Published var hasSpeechRecognitionPermissions = false
-
+    
     // MARK: - AVFoundation Properties
     let session = AVCaptureSession()
     private var movieFileOutput = AVCaptureMovieFileOutput()
@@ -31,18 +32,18 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
     private var recognitionRequest: SFSpeechURLRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
-
+    
     override init() {
         super.init()
         loadRecordings() // Load existing recordings on init
     }
-
+    
     // MARK: - Camera Setup and Permissions
     func setupCamera() {
         checkCameraPermissions()
         checkSpeechRecognitionPermissions()
     }
-
+    
     private func checkCameraPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -63,7 +64,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             }
         }
     }
-
+    
     private func checkAudioPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
@@ -88,14 +89,14 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             }
         }
     }
-
+    
     private func configureSession() {
         session.beginConfiguration()
         
         if session.canSetSessionPreset(.high) {
             session.sessionPreset = .high
         }
-
+        
         // Video Input
         guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
               let videoInput = try? AVCaptureDeviceInput(device: videoDevice),
@@ -105,7 +106,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             return
         }
         session.addInput(videoInput)
-
+        
         // Audio Input
         guard let audioDevice = AVCaptureDevice.default(for: .audio),
               let audioInput = try? AVCaptureDeviceInput(device: audioDevice),
@@ -115,7 +116,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             return
         }
         session.addInput(audioInput)
-
+        
         // Movie File Output
         if session.canAddOutput(movieFileOutput) {
             session.addOutput(movieFileOutput)
@@ -129,7 +130,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             self?.session.startRunning()
         }
     }
-
+    
     // MARK: - Recording
     func startRecording() {
         guard !isRecording && hasCameraPermissions else { return }
@@ -147,7 +148,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
         guard isRecording else { return }
         movieFileOutput.stopRecording() // Delegate will set isRecording to false
     }
-
+    
     func stopSession() {
         if session.isRunning {
             session.stopRunning()
@@ -169,12 +170,12 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             }
         }
     }
-
+    
     // MARK: - File Management
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
-
+    
     func loadRecordings() {
         let fileManager = FileManager.default
         let documentsURL = getDocumentsDirectory()
@@ -183,7 +184,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             self.recordedVideos = fileURLs.filter { $0.pathExtension == "mov" && $0.lastPathComponent.starts(with: "recording_") }
             self.sortRecordings()
             if let last = self.recordedVideos.first { // Assuming sorted descending
-                 self.lastRecordedVideoURL = last
+                self.lastRecordedVideoURL = last
             }
         } catch {
             print("Error while enumerating files \(documentsURL.path): \(error.localizedDescription)")
@@ -199,7 +200,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             return time1 > time2 // Sort descending, newest first
         }
     }
-
+    
     func deleteRecording(url: URL) {
         do {
             try FileManager.default.removeItem(at: url)
@@ -212,7 +213,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             print("Error deleting recording \(url): \(error.localizedDescription)")
         }
     }
-
+    
     func deleteAllRecordings() {
         for url in recordedVideos {
             do {
@@ -224,7 +225,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
         recordedVideos.removeAll()
         lastRecordedVideoURL = nil
     }
-
+    
     // MARK: - Speech Recognition
     func checkSpeechRecognitionPermissions() {
         SFSpeechRecognizer.requestAuthorization { [weak self] status in
@@ -262,7 +263,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             recognitionTask = nil
             recognitionRequest = nil
         }
-
+        
         isTranscribing = true
         transcriptionText = ""
         transcriptionError = nil
@@ -275,7 +276,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
         }
         
         recognitionRequest.shouldReportPartialResults = false // Set to true if you want live updates
-
+        
         recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [weak self] result, error in
             guard let self = self else { return }
             
@@ -297,6 +298,106 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
                     self.recognitionTask = nil
                 }
             }
+        }
+    }
+    
+    
+    func loadAudioSamplesAndPredict(videoURL: URL) throws -> [VoiceEmotionClassifierOutput] {
+        // Load the AVAsset and get audio track
+        let asset = AVAsset(url: videoURL)
+        guard let audioTrack = asset.tracks(withMediaType: .audio).first else {
+            throw NSError(domain: "AudioError", code: 1, userInfo: [NSLocalizedDescriptionKey: "No audio track found"])
+        }
+
+        // Read raw PCM audio at 48kHz
+        let reader = try AVAssetReader(asset: asset)
+        let outputSettings: [String: Any] = [
+            AVFormatIDKey: kAudioFormatLinearPCM,
+            AVSampleRateKey: 48000.0,
+            AVNumberOfChannelsKey: 1,
+            AVLinearPCMIsFloatKey: true,
+            AVLinearPCMBitDepthKey: 32
+        ]
+        let output = AVAssetReaderTrackOutput(track: audioTrack, outputSettings: outputSettings)
+        reader.add(output)
+        reader.startReading()
+
+        var audioData = [Float]()
+        while reader.status == .reading,
+              let sampleBuffer = output.copyNextSampleBuffer(),
+              let blockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer) {
+
+            let length = CMBlockBufferGetDataLength(blockBuffer)
+            var buffer = [Float](repeating: 0, count: length / MemoryLayout<Float>.size)
+            buffer.withUnsafeMutableBytes {
+                CMBlockBufferCopyDataBytes(blockBuffer, atOffset: 0, dataLength: length, destination: $0.baseAddress!)
+            }
+            audioData.append(contentsOf: buffer)
+        }
+
+        guard reader.status == .completed else {
+            throw NSError(domain: "AudioError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to read audio samples"])
+        }
+
+        // Set up AVAudioConverter to resample to 16kHz mono
+        let inputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 48000.0, channels: 1, interleaved: false)!
+        let outputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 16000.0, channels: 1, interleaved: false)!
+        let inputFrameCount = AVAudioFrameCount(audioData.count)
+        let inputBuffer = AVAudioPCMBuffer(pcmFormat: inputFormat, frameCapacity: inputFrameCount)!
+        inputBuffer.frameLength = inputFrameCount
+        audioData.withUnsafeBufferPointer {
+            inputBuffer.floatChannelData!.pointee.assign(from: $0.baseAddress!, count: Int(inputFrameCount))
+        }
+
+        let converter = AVAudioConverter(from: inputFormat, to: outputFormat)!
+        let ratio = outputFormat.sampleRate / inputFormat.sampleRate
+        let outputFrameCapacity = AVAudioFrameCount(Double(inputFrameCount) * ratio)
+        let outputBuffer = AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: outputFrameCapacity)!
+        var error: NSError?
+        converter.convert(to: outputBuffer, error: &error) { _, outStatus in
+            outStatus.pointee = .haveData
+            return inputBuffer
+        }
+
+        if let error = error {
+            throw error
+        }
+
+        // Get the resampled data as [Float]
+        let resampledData = Array(UnsafeBufferPointer(start: outputBuffer.floatChannelData![0],
+                                                      count: Int(outputBuffer.frameLength)))
+
+        // Prepare sliding windows
+        let windowSize = 15600
+        let hopSize = 7800 // 50% overlap
+        let model = try VoiceEmotionClassifier()
+        var predictions: [VoiceEmotionClassifierOutput] = []
+
+        for start in stride(from: 0, to: resampledData.count - windowSize + 1, by: hopSize) {
+            let window = Array(resampledData[start..<start + windowSize])
+            let mlArray = try MLMultiArray(shape: [NSNumber(value: windowSize)], dataType: .float32)
+            for (i, sample) in window.enumerated() {
+                mlArray[i] = NSNumber(value: sample)
+            }
+            let result = try model.prediction(audioSamples: mlArray)
+            predictions.append(result)
+        }
+
+        return predictions
+    }
+
+    
+    func detectEmotion(url: URL){
+        do {
+            let results = try loadAudioSamplesAndPredict(videoURL: url)
+            for (i, result) in results.enumerated() {
+                print("Prediction \(i + 1): \(result.target)")
+                for (label, prob) in result.targetProbability.sorted(by: { $0.value > $1.value }) {
+                    print("  - \(label): \(String(format: "%.2f", prob * 100))%")
+                }
+            }
+        } catch {
+            print("Error during prediction: \(error)")
         }
     }
 }

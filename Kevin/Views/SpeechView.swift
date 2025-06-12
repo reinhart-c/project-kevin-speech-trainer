@@ -404,6 +404,7 @@ struct TranscriptionView: View {
             // Automatically start transcription if a videoURL is provided and not already transcribing
             if let url = videoURL, !viewModel.isTranscribing, viewModel.transcriptionText.isEmpty {
                 viewModel.transcribeVideo(url: url)
+                viewModel.detectEmotion(url: url) 
             }
         }
     }
