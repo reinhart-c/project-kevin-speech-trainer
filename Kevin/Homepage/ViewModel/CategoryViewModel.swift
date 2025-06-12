@@ -14,21 +14,21 @@ class CategoryViewModel: ObservableObject {
             title: "Product deserves the spotlight",
             subtitle: "Deliver product pitches that build trust and interest",
             tag: "Product",
-            backgroundColor: Color.blue.opacity(0.1),
+            backgroundColor: Color.lightBlue,
             icon: "lightbulb"
         ),
         Category(
             title: "Lead with purpose, speak with power",
             subtitle: "Deliver powerful messages that move people",
             tag: "Political",
-            backgroundColor: Color.pink.opacity(0.2),
+            backgroundColor: Color.lightPink,
             icon: "flame"
         ),
         Category(
             title: "From cause to community",
             subtitle: "Deliver talks that drive social action",
             tag: "Social Advocacy",
-            backgroundColor: Color.purple.opacity(0.15),
+            backgroundColor: Color.lightPurple,
             icon: "person.3"
         )
     ]

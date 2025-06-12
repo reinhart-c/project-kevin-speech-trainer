@@ -35,7 +35,7 @@ struct ProgressItem: View {
             HStack(spacing: 4) {
                 Text(title)
                     .fontWeight(.semibold)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.black)
                     .font(.system(size: 11))
                 
                 Text(date)
@@ -77,12 +77,13 @@ struct ProgressItem: View {
             .clipShape(Capsule())
         }
         .padding()
-        .background(Color(.black).opacity(0.03))
+        .background(Color.lightGrey)
         .clipShape(RoundedRectangle(cornerRadius: 30))
-        .frame(height:45)
+        .frame(height:60)
     }
 }
 
 #Preview {
+    ProgressItem(title: "This is my first practice to present product", date: "12 March 2024, 20:00", categoryName: "Political", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
     ProgressItem(title: "This is my first practice to present product", date: "12 March 2024, 20:00", categoryName: "Political", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
 }
