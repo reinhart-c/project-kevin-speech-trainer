@@ -78,12 +78,14 @@ struct SpeechView: View {
                     if speechViewModel.isRecording {
                         speechViewModel.stopRecording()
                         prompterViewModel.stopHighlighting()
-                        showingVideoPlayer = false 
-                        speechViewModel.lastRecordedVideoURL = nil
-                        
+                        // Consider if you want to immediately show the camera or the video player after stopping
+                        // showingVideoPlayer = false // This was present, decide if still needed
+                        // speechViewModel.lastRecordedVideoURL = nil // This might clear the URL before it can be used
+                    } else {
                         prompterViewModel.resetHighlighting()
                         prompterViewModel.startHighlighting()
-                        speechViewModel.startRecording()     
+                        speechViewModel.startRecording()
+                        showingVideoPlayer = false
                     }
                 }) {
                     VStack {
@@ -241,6 +243,7 @@ struct SpeechView: View {
         .onChange(of: prompterViewModel.prompterHasFinished) { oldValue, newValue in // New: Observe prompter state
             if newValue == true && speechViewModel.isRecording {
                 print("Prompter has finished. Stopping recording.")
+                speechViewModel.stopRecording()
                }
         }
         .sheet(isPresented: $showingTranscriptionView) {
