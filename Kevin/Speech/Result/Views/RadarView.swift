@@ -45,7 +45,7 @@ struct RadarView: View {
                     }
                     path.closeSubpath()
                 }
-                .fill(Color.blue.opacity(0.3))
+                .fill(Color.blueRadar.opacity(0.3))
 
                 // Radar Polygon Stroke
                 Path { path in
@@ -62,7 +62,7 @@ struct RadarView: View {
                     }
                     path.closeSubpath()
                 }
-                .stroke(Color.blue, lineWidth: 2)
+                .stroke(Color.blueRadar, lineWidth: 2)
 
                 // Labels
                 ForEach(0..<count, id: \.self) { i in
@@ -72,8 +72,7 @@ struct RadarView: View {
                     let labelY = center.y + (maxRadius + 20) * sin(angle)
 
                     Text(label)
-                        .font(.caption2)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.black)
                         .position(x: labelX, y: labelY)
                 }
             }
