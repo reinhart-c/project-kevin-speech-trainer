@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 class ResultViewModel: ObservableObject {
     @Published var result: Result?
@@ -31,14 +32,14 @@ class ResultViewModel: ObservableObject {
         isCalculating = false
     }
     
-    var scoreColor: String {
-        guard let score = result?.score else { return "gray" }
+    var scoreColor: Color {
+        guard let score = result?.score else { return .gray }
         
         switch score {
-        case 90...100: return "green"
-        case 70...89: return "blue"
-        case 50...69: return "orange"
-        default: return "red"
+        case 90...100: return .green
+        case 70...89: return .blue
+        case 50...69: return .orange
+        default: return .red
         }
     }
     

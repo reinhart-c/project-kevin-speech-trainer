@@ -42,12 +42,12 @@ struct ResultView: View {
                         VStack(spacing: 10) {
                             Text("\(result.score)")
                                 .font(.system(size: 72, weight: .bold, design: .rounded))
-                                .foregroundColor(Color(viewModel.scoreColor))
+                                .foregroundColor(viewModel.scoreColor) // Removed Color() wrapper
                             
                             Text(viewModel.scoreGrade)
                                 .font(.title2)
                                 .fontWeight(.medium)
-                                .foregroundColor(Color(viewModel.scoreColor))
+                                .foregroundColor(viewModel.scoreColor) // Removed Color() wrapper
                             
                             Text("out of 100")
                                 .font(.caption)
@@ -55,7 +55,7 @@ struct ResultView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)
-                        .background(Color(viewModel.scoreColor).opacity(0.1))
+                        .background(viewModel.scoreColor.opacity(0.1)) // Use .opacity directly on the Color
                         .cornerRadius(15)
                         
                         // Statistics
