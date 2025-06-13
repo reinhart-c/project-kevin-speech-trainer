@@ -438,6 +438,8 @@ struct TranscriptionView: View {
         .onAppear {
             if let url = videoURL, !viewModel.isTranscribing, viewModel.transcriptionText.isEmpty {
                 viewModel.transcribeVideo(url: url)
+//                test mlmodel
+                viewModel.detectEmotion(url: url)
             }
         }
     }
