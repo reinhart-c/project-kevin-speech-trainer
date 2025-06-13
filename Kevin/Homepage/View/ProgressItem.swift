@@ -36,50 +36,52 @@ struct ProgressItem: View {
                 Text(title)
                     .fontWeight(.semibold)
                     .foregroundColor(.black)
-                    .font(.system(size: 11))
+                    .font(.system(size: 18))
+                
+                Spacer()
                 
                 Text(date)
-                    .font(.caption)
                     .foregroundColor(.gray)
-                    .font(.system(size: 9))
+                    .font(.system(size: 16))
                     
             }
             Spacer()
+                .frame(width: 100)
             
             // Category Badge (temp, use if else)
             HStack(spacing: 4) {
                 Image(systemName: categoryDetails.icon)
                 Text(categoryName)
             }
-            .font(.caption)
             .foregroundColor(categoryDetails.color)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
+            .font(.system(size: 16))
+            
+            Spacer()
+                .frame(width: 150)
 
             // Score Badge
             Text("\(score)")
-                .font(.caption)
+                .font(.system(size: 17))
                 .foregroundColor(.white)
-                .padding(8)
+                .padding(11)
                 .background(Color.black)
                 .clipShape(Circle())
-
-            // Tag Capsule
-            HStack(spacing: 4) {
-                Image(systemName: "wave.3.right")
-                Text("“\(tag)”")
-            }
-            .font(.caption)
-            .foregroundColor(.gray)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(Color(.lightGrey))
-            .clipShape(Capsule())
+            
+            Spacer()
+                .frame(width: 100)
+            
+            Image(systemName: "chevron.right")
+                .foregroundStyle(Color.darkGray)
+                .font(.system(size: 30))
         }
         .padding()
         .background(Color.lightGrey)
-        .clipShape(RoundedRectangle(cornerRadius: 30))
-        .frame(height:60)
+        .clipShape(RoundedRectangle(cornerRadius: 25))
+        .frame(height:75)
+        .padding(.horizontal)
+        .padding([.leading, .trailing], 40)
     }
 }
 

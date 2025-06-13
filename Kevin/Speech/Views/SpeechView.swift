@@ -51,7 +51,6 @@ struct SpeechView: View {
                             .font(.headline)
                             .foregroundColor(.gray)
                         Text("Please grant camera and microphone access in Settings.")
-                            .font(.caption)
                             .foregroundColor(.gray)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)

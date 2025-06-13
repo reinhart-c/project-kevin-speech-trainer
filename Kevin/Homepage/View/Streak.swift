@@ -14,14 +14,15 @@ struct Streak: View {
             ZStack{
                 Circle()
                     .fill(Color.white)
-                    .frame(width:20, height:20)
+                    .frame(width:35, height:35)
                 Text("🔥")
-                    .font(.system(size: 10))
+                    .font(.system(size: 22))
             }
             Text("Practice Streak Today!")
                 .fontWeight(.semibold)
-                .font(.system(size: 10))
-            
+                .font(.system(size: 15))
+            Spacer()
+                .frame(width: 40)
             //Streak Bars
             HStack{
                 ForEach(0..<3){index in
@@ -33,7 +34,7 @@ struct Streak: View {
                                     )
                                 ): AnyShapeStyle(Color.pinkBarEmpty)
                               )
-                        .frame(width:30, height:5)
+                        .frame(width:65, height:10)
                 }
             }
         }

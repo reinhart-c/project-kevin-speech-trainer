@@ -20,11 +20,11 @@ extension Category {
     var gradient: LinearGradient {
         switch tag {
         case "Product":
-            return LinearGradient(colors: [.blueIcon, .lightBlue], startPoint: .topLeading, endPoint: .bottomTrailing)
+            return LinearGradient(colors: [.blueIcon, .lightBlue], startPoint: .top, endPoint: .bottom)
         case "Social Advocacy":
-            return LinearGradient(colors: [.purpleIcon, .lightPurple], startPoint: .topLeading, endPoint: .bottomTrailing)
+            return LinearGradient(colors: [.purpleIcon, .lightPurple], startPoint: .top, endPoint: .bottom)
         case "Political":
-            return LinearGradient(colors: [.pinkIcon, .lightPink], startPoint: .topLeading, endPoint: .bottomTrailing)
+            return LinearGradient(colors: [.pinkIcon, .lightPink], startPoint: .top, endPoint: .bottom)
         default:
             return LinearGradient(colors: [.gray, .gray], startPoint: .top, endPoint: .bottom)
         }

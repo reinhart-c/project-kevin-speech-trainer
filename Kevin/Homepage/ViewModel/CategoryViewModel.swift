@@ -15,7 +15,7 @@ class CategoryViewModel: ObservableObject {
             subtitle: "Deliver product pitches that build trust and interest",
             tag: "Product",
             backgroundColor: Color.lightBlue,
-            icon: "lightbulb"
+            icon: "lightbulb.max"
         ),
         Category(
             title: "Lead with purpose, speak with power",
