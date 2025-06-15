@@ -107,6 +107,17 @@ struct ResultView: View {
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                 
+                                // Updated EmotionRadarView with dominant emotion display
+                                EmotionRadarView(
+                                    width: 280, // Increased width to accommodate the header
+                                    mainColor: .blue,
+                                    subtleColor: .gray,
+                                    quantityIncrementalDividers: 3,
+                                    dimensions: emotionDimensions,
+                                    data: [EmotionDataPoint(emotionBreakdown: emotionBreakdown, color: .blue)]
+                                )
+                                .padding(.vertical, 10)
+                                
                                 ForEach(emotionBreakdown.sorted(by: { $0.value > $1.value }), id: \.key) { emotion, percentage in
                                     EmotionBar(
                                         emotion: emotion,
@@ -168,6 +179,34 @@ struct ResultView: View {
         .background(Color.gray.opacity(0.1))
         .cornerRadius(10)
     }
+    
+    private func createRadarDataPoints(from emotionBreakdown: [String: Double]) -> [RadarModel] {
+        let emotionOrder = ["happy", "sad", "angry", "fear", "disgust", "surprise", "neutral"]
+        
+        return emotionOrder.compactMap { emotion in
+            // Find matching emotion (case insensitive)
+            if let percentage = emotionBreakdown.first(where: { $0.key.lowercased() == emotion })?.value {
+                return RadarModel(
+                    label: emotion.capitalized,
+                    value: percentage / 100.0 // Convert percentage to 0-1 range
+                )
+            }
+            return nil
+        }
+    }
+
+    private func emotionColor(for emotion: String) -> Color {
+        switch emotion.lowercased() {
+        case "happy", "joy": return .yellow
+        case "sad", "sadness": return .blue
+        case "angry", "anger": return .red
+        case "fear": return .purple
+        case "disgust": return .green
+        case "surprise": return .orange
+        case "neutral": return .gray
+        default: return .secondary
+        }
+    }
 }
 
 struct StatRow: View {
@@ -213,21 +252,6 @@ struct DetailSection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(color.opacity(0.1))
                 .cornerRadius(6)
-        }
-    }
-}
-
-    // Add helper function for emotion colors
-    private func emotionColor(for emotion: String) -> Color {
-        switch emotion.lowercased() {
-        case "happy", "joy": return .yellow
-        case "sad", "sadness": return .blue
-        case "angry", "anger": return .red
-        case "fear": return .purple
-        case "disgust": return .green
-        case "surprise": return .orange
-        case "neutral": return .gray
-        default: return .secondary
         }
     }
 }
