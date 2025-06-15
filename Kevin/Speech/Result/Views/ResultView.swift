@@ -86,15 +86,7 @@ struct ResultView: View {
                                 )
                             }
                             
-                            // Add emotion analysis if available
-                            if let emotion = result.dominantEmotion,
-                               let percentage = result.dominantEmotionPercentage {
-                                StatRow(
-                                    title: "Dominant Emotion",
-                                    value: "\(emotion) (\(String(format: "%.1f", percentage))%)",
-                                    color: emotionColor(for: emotion)
-                                )
-                            }
+                            // Removed the Dominant Emotion StatRow since it's shown in the dedicated emotion analysis section
                         }
                         .padding()
                         .background(Color.gray.opacity(0.05))
