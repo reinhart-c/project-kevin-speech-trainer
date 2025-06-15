@@ -25,7 +25,7 @@ struct KevinApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            SpeechView()
 //            LoadingView()
         }
         .modelContainer(sharedModelContainer)

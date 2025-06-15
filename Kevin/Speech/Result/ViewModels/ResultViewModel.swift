@@ -13,12 +13,16 @@ class ResultViewModel: ObservableObject {
     @Published var result: Result?
     @Published var isCalculating: Bool = false
     
-    func calculateScore(transcribedText: String, expectedText: String) {
+    func calculateScore(transcribedText: String, expectedText: String, emotionResults: [VoiceEmotionClassifierOutput]? = nil) {
         isCalculating = true
         
         // Simulate some processing time for better UX
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            let result = Result(transcribedText: transcribedText, expectedText: expectedText)
+            let result = Result(
+                transcribedText: transcribedText, 
+                expectedText: expectedText, 
+                emotionResults: emotionResults
+            )
             
             DispatchQueue.main.async {
                 self?.result = result

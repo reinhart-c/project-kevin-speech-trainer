@@ -85,10 +85,40 @@ struct ResultView: View {
                                     color: .red
                                 )
                             }
+                            
+                            // Add emotion analysis if available
+                            if let emotion = result.dominantEmotion,
+                               let percentage = result.dominantEmotionPercentage {
+                                StatRow(
+                                    title: "Dominant Emotion",
+                                    value: "\(emotion) (\(String(format: "%.1f", percentage))%)",
+                                    color: emotionColor(for: emotion)
+                                )
+                            }
                         }
                         .padding()
                         .background(Color.gray.opacity(0.05))
                         .cornerRadius(10)
+                        
+                        // Add emotion breakdown section if available
+                        if let emotionBreakdown = result.emotionBreakdown {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Emotion Analysis")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                
+                                ForEach(emotionBreakdown.sorted(by: { $0.value > $1.value }), id: \.key) { emotion, percentage in
+                                    EmotionBar(
+                                        emotion: emotion,
+                                        percentage: percentage,
+                                        color: emotionColor(for: emotion)
+                                    )
+                                }
+                            }
+                            .padding()
+                            .background(Color.gray.opacity(0.05))
+                            .cornerRadius(10)
+                        }
                         
                         // Detailed Breakdown (Optional)
                         if !result.extraWords.isEmpty || !result.missedWords.isEmpty {
@@ -183,6 +213,58 @@ struct DetailSection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(color.opacity(0.1))
                 .cornerRadius(6)
+        }
+    }
+}
+
+    // Add helper function for emotion colors
+    private func emotionColor(for emotion: String) -> Color {
+        switch emotion.lowercased() {
+        case "happy", "joy": return .yellow
+        case "sad", "sadness": return .blue
+        case "angry", "anger": return .red
+        case "fear": return .purple
+        case "disgust": return .green
+        case "surprise": return .orange
+        case "neutral": return .gray
+        default: return .secondary
+        }
+    }
+}
+
+// Add new EmotionBar component
+struct EmotionBar: View {
+    let emotion: String
+    let percentage: Double
+    let color: Color
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(emotion.capitalized)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                
+                Spacer()
+                
+                Text("\(String(format: "%.1f", percentage))%")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(color)
+            }
+            
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(height: 4)
+                    
+                    Rectangle()
+                        .fill(color)
+                        .frame(width: geometry.size.width * (percentage / 100), height: 4)
+                }
+            }
+            .frame(height: 4)
         }
     }
 }

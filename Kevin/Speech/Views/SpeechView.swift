@@ -263,17 +263,30 @@ struct SpeechView: View {
 
         // REVISED: Rely primarily on isTranscribing finishing AFTER recording has stopped
         .onChange(of: speechViewModel.isTranscribing) { oldValue, newValue in
-            // newValue is the new state of isTranscribing
             print("🔄 isTranscribing changed from \(oldValue) to \(newValue)")
             print("📊 current transcriptionText: '\(speechViewModel.transcriptionText)'")
             print("🎬 current isRecording: \(speechViewModel.isRecording)")
             
-            // When transcription stops (newValue is false) AND recording has already stopped
-            if !newValue && !speechViewModel.isRecording {
-                print("🎯 Transcription finished and recording is stopped. Calculating score and showing result.")
+            // When transcription stops AND recording has stopped AND emotion analysis is complete
+            if !newValue && !speechViewModel.isRecording && !speechViewModel.isAnalyzingEmotion {
+                print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
                 resultViewModel.calculateScore(
-                    transcribedText: speechViewModel.transcriptionText, // This can be empty
-                    expectedText: prompterViewModel.prompter.script
+                    transcribedText: speechViewModel.transcriptionText,
+                    expectedText: prompterViewModel.prompter.script,
+                    emotionResults: speechViewModel.emotionResults // Pass emotion results
+                )
+                showingResult = true
+            }
+        }
+        // Also add onChange for emotion analysis completion
+        .onChange(of: speechViewModel.isAnalyzingEmotion) { oldValue, newValue in
+            // When emotion analysis stops AND transcription has stopped AND recording has stopped
+            if !newValue && !speechViewModel.isTranscribing && !speechViewModel.isRecording {
+                print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
+                resultViewModel.calculateScore(
+                    transcribedText: speechViewModel.transcriptionText,
+                    expectedText: prompterViewModel.prompter.script,
+                    emotionResults: speechViewModel.emotionResults
                 )
                 showingResult = true
             }
