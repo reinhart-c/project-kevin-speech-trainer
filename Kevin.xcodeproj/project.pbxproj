@@ -25,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		558105DA2DFAB053000C21AB /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
+		CB3CADD92E000634006BA58D /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBC32DD52DF80DDD007B00B1 /* Kevin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kevin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBDC3CDD2DF984750051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBDC3D092DFAB4A00051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
@@ -51,6 +52,11 @@
 
 /* Begin PBXGroup section */
 		558105DD2DFAB053000C21AB /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CB3CADDD2E000634006BA58D /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -146,6 +152,10 @@
 				{
 					ProductGroup = 558105DD2DFAB053000C21AB /* Products */;
 					ProjectRef = 558105DA2DFAB053000C21AB /* Kevin.xcodeproj */;
+				},
+				{
+					ProductGroup = CB3CADDD2E000634006BA58D /* Products */;
+					ProjectRef = CB3CADD92E000634006BA58D /* Kevin.xcodeproj */;
 				},
 				{
 					ProductGroup = CBDC3D0C2DFAB4A00051B96A /* Products */;
@@ -309,7 +319,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = AZ7BZG942H;
+				DEVELOPMENT_TEAM = UA7H73P97K;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -340,7 +350,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = AZ7BZG942H;
+				DEVELOPMENT_TEAM = UA7H73P97K;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;

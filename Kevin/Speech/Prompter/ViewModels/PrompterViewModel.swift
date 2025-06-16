@@ -14,32 +14,33 @@ class PrompterViewModel: ObservableObject {
     @Published var words: [String] = []
     @Published var currentWordIndex: Int = -1
     @Published var prompterHasFinished: Bool = false // New: To signal when prompter is done
-
+    
     private var scriptTimer: Timer?
     private let highlightingSpeed: TimeInterval = 0.5 // Seconds per word
-
+    
     // Allow script injection for flexibility, with a default
     init(script: String = """
-        Hello and welcome to this presentation.
-        Today, we will be discussing the future of technology.
-        Our first point will cover artificial intelligence.
-        Then, we'll move on to blockchain and its applications.
-        Finally, we will explore the impact of quantum computing.
-        Remember to speak clearly and maintain eye contact.
-        Pause at appropriate moments to let your points sink in.
-        This is a hardcoded script for now.
-        We can make this dynamic later.
-        Good luck with your speech!
+        Every once in a while, a revolutionary product comes along that changes everything and
+        Apple has been... well, first of all, one’s very fortunate if you get to work on just one of these
+        in your career. Apple has been very fortunate. It’s been able to introduce a few of these into
+        the world.
+        1984 - we introduced the Macintosh. It didn’t just change Apple. It changed the whole
+        computer industry.
+        In 2001, we introduced the first iPod. And it didn’t just change the way we all listen to
+        music, it changed the entire music industry.
+        Well, today we’re introducing three revolutionary products of this class. The first one is a
+        widescreen iPod with touch controls. The second is a revolutionary mobile phone.
+        And the third is a breakthrough Internet communications device.
         """) {
         self.prompter = Prompter(script: script)
         self.words = tokenizeScript(script)
         // Highlighting will be started externally now
     }
-
+    
     private func tokenizeScript(_ script: String) -> [String] {
         return script.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
     }
-
+    
     func startHighlighting() {
         if words.isEmpty {
             prompterHasFinished = true // If no words, it's immediately finished
@@ -48,7 +49,7 @@ class PrompterViewModel: ObservableObject {
         stopHighlighting() // Ensure any existing timer is stopped
         currentWordIndex = -1
         prompterHasFinished = false // Reset finished flag
-
+        
         scriptTimer = Timer.scheduledTimer(withTimeInterval: highlightingSpeed, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             if self.currentWordIndex < self.words.count - 1 {
@@ -59,24 +60,24 @@ class PrompterViewModel: ObservableObject {
             }
         }
     }
-
+    
     func stopHighlighting() {
         scriptTimer?.invalidate()
         scriptTimer = nil
     }
-
+    
     func resetHighlighting() {
         stopHighlighting()
         currentWordIndex = -1
         prompterHasFinished = false
     }
-
+    
     func updateScript(_ newScript: String) {
         prompter.script = newScript
         words = tokenizeScript(newScript)
         resetHighlighting() // Reset state if script changes
     }
-
+    
     deinit {
         stopHighlighting()
     }

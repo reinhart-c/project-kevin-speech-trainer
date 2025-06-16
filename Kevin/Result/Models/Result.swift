@@ -15,7 +15,12 @@ struct Result {
     let extraWords: [String]
     let missedWords: [String]
     
-    init(transcribedText: String, expectedText: String) {
+    // Add emotion properties
+    let dominantEmotion: String?
+    let dominantEmotionPercentage: Double?
+    let emotionBreakdown: [String: Double]? // For detailed breakdown
+    
+    init(transcribedText: String, expectedText: String, emotionResults: [VoiceEmotionClassifierOutput]? = nil) {
         self.transcribedText = transcribedText
         self.expectedText = expectedText
         
@@ -38,6 +43,18 @@ struct Result {
             matchedWords: matchedWords,
             extraWords: extraWords
         )
+        
+        // Process emotion results
+        if let emotionResults = emotionResults, !emotionResults.isEmpty {
+            let (dominant, percentage, breakdown) = Self.processEmotionResults(emotionResults)
+            self.dominantEmotion = dominant
+            self.dominantEmotionPercentage = percentage
+            self.emotionBreakdown = breakdown
+        } else {
+            self.dominantEmotion = nil
+            self.dominantEmotionPercentage = nil
+            self.emotionBreakdown = nil
+        }
     }
     
     private static func normalizeAndTokenize(_ text: String) -> [String] {
@@ -65,5 +82,38 @@ struct Result {
         
         return min(100, max(0, Int(score.rounded())))
     }
+    
+    private static func processEmotionResults(_ results: [VoiceEmotionClassifierOutput]) -> (String?, Double?, [String: Double]?) {
+        guard !results.isEmpty else { return (nil, nil, nil) }
+        
+        // Aggregate probabilities across all predictions
+        var emotionTotals: [String: Double] = [:]
+        var emotionCounts: [String: Int] = [:]
+        
+        for result in results {
+            for (emotion, probability) in result.targetProbability {
+                emotionTotals[emotion, default: 0.0] += probability
+                emotionCounts[emotion, default: 0] += 1
+            }
+        }
+        
+        // Calculate averages
+        var emotionAverages: [String: Double] = [:]
+        for (emotion, total) in emotionTotals {
+            let count = emotionCounts[emotion] ?? 1
+            emotionAverages[emotion] = total / Double(count)
+        }
+        
+        // Find dominant emotion
+        let sortedEmotions = emotionAverages.sorted { $0.value > $1.value }
+        guard let dominantEmotion = sortedEmotions.first else {
+            return (nil, nil, nil)
+        }
+        
+        return (
+            dominantEmotion.key,
+            dominantEmotion.value * 100, // Convert to percentage
+            emotionAverages.mapValues { $0 * 100 } // Convert all to percentages
+        )
+    }
 }
-

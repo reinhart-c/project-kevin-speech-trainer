@@ -12,12 +12,14 @@ import AVKit
 struct SpeechView: View {
     @StateObject private var speechViewModel = SpeechViewModel()
     @StateObject private var prompterViewModel = PrompterViewModel()
-    @StateObject private var resultViewModel = ResultViewModel() // Add ResultViewModel
+    @StateObject private var resultViewModel = ResultViewModel()
 
     @State private var showingVideoPlayer = false
     @State private var showingTranscriptionView = false
     @State private var selectedVideoForTranscription: URL?
-    @State private var showingResult = false // Add state for showing result
+    @State private var showingResult = false
+    @State private var videoPlayer: AVPlayer?
+    @State private var isVideoPlaying = false
     
     var body: some View {
         VStack(spacing: 20) {
@@ -29,10 +31,15 @@ struct SpeechView: View {
             HStack(spacing: 20) {
                 ZStack {
                     if showingVideoPlayer, let videoURL = speechViewModel.lastRecordedVideoURL {
-                        VideoPlayer(player: AVPlayer(url: videoURL))
+                        VideoPlayer(player: videoPlayer ?? AVPlayer(url: videoURL))
                             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                             .aspectRatio(16/9, contentMode: .fit)
                             .cornerRadius(15)
+                            .onAppear {
+                                if videoPlayer == nil {
+                                    videoPlayer = AVPlayer(url: videoURL)
+                                }
+                            }
                     } else {
                         CameraPreview(session: speechViewModel.session)
                             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
@@ -69,10 +76,14 @@ struct SpeechView: View {
                     ResultView(viewModel: resultViewModel) {
                         // Reset action
                         showingResult = false
+                        showingVideoPlayer = false
                         resultViewModel.reset()
                         prompterViewModel.resetHighlighting()
                         speechViewModel.transcriptionText = ""
                         speechViewModel.transcriptionError = nil
+                        speechViewModel.emotionResults = []
+                        videoPlayer = nil
+                        isVideoPlaying = false
                     }
                 } else {
                     PrompterView(viewModel: prompterViewModel)
@@ -81,87 +92,127 @@ struct SpeechView: View {
             .padding(.horizontal)
             
             Text(speechViewModel.isRecording ? "Recording in progress..." :
-                 showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil ? "Playing recorded video" : "Ready to record")
+                 showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil ?
+                 (isVideoPlaying ? "Playing recorded video" : "Video paused") : "Ready to record")
                 .font(.headline)
                 .foregroundColor(speechViewModel.isRecording ? .red :
-                               (showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil) ? .blue : .primary)
+                               (showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil) ?
+                               (isVideoPlaying ? .blue : .orange) : .primary)
             
+            // Simplified control buttons based on state
             HStack(spacing: 30) {
-                Button(action: {
-                    if speechViewModel.isRecording {
-                        speechViewModel.stopRecording()
-                        prompterViewModel.stopHighlighting()
-                    } else {
-                        showingResult = false // Hide result when starting new recording
-                        resultViewModel.reset()
-                        prompterViewModel.resetHighlighting()
-                        prompterViewModel.startHighlighting()
-                        speechViewModel.startRecording()
-                        showingVideoPlayer = false
-                    }
-                }) {
-                    VStack {
-                        Circle()
-                            .fill(speechViewModel.isRecording ? Color.red : Color.blue)
-                            .frame(width: 80, height: 80)
-                            .overlay(
-                                Image(systemName: speechViewModel.isRecording ? "stop.fill" : "record.circle")
-                                    .foregroundColor(.white)
-                                    .font(.title)
-                            )
-                        Text(speechViewModel.isRecording ? "Stop" : "Record")
-                            .font(.caption)
-                            .fontWeight(.medium)
-                    }
-                }
-                .disabled(!speechViewModel.hasCameraPermissions)
-                
-                if showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil {
+                if showingVideoPlayer {
+                    // Video playback controls
                     Button(action: {
-                        showingVideoPlayer = false
+                        if isVideoPlaying {
+                            videoPlayer?.pause()
+                            isVideoPlaying = false
+                        } else {
+                            videoPlayer?.play()
+                            isVideoPlaying = true
+                        }
                     }) {
                         VStack {
                             Circle()
-                                .fill(Color.gray)
-                                .frame(width: 80, height: 80)
+                                .fill(isVideoPlaying ? Color.orange : Color.blue)
+                                .frame(width: 100, height: 100)
                                 .overlay(
-                                    Image(systemName: "camera.fill")
+                                    Image(systemName: isVideoPlaying ? "pause.fill" : "play.fill")
                                         .foregroundColor(.white)
-                                        .font(.title)
+                                        .font(.system(size: 32))
                                 )
-                            Text("Camera")
-                                .font(.caption)
-                                .fontWeight(.medium)
+                            Text(isVideoPlaying ? "Pause" : "Play")
+                                .font(.headline)
+                                .fontWeight(.semibold)
                         }
                     }
-                }
-               
-                if !speechViewModel.isRecording && !speechViewModel.recordedVideos.isEmpty && !showingVideoPlayer {
+                    
+                    // Try Again button for video playback state
                     Button(action: {
-                        if let latestVideo = speechViewModel.recordedVideos.first {
-                            speechViewModel.lastRecordedVideoURL = latestVideo
-                            showingVideoPlayer = true
-                        }
+                        // Reset to camera view
+                        showingVideoPlayer = false
+                        showingResult = false
+                        resultViewModel.reset()
+                        prompterViewModel.resetHighlighting()
+                        speechViewModel.transcriptionText = ""
+                        speechViewModel.transcriptionError = nil
+                        speechViewModel.emotionResults = []
+                        videoPlayer?.pause()
+                        videoPlayer = nil
+                        isVideoPlaying = false
                     }) {
                         VStack {
                             Circle()
                                 .fill(Color.green)
-                                .frame(width: 80, height: 80)
+                                .frame(width: 100, height: 100)
                                 .overlay(
-                                    Image(systemName: "play.fill")
+                                    Image(systemName: "arrow.clockwise")
                                         .foregroundColor(.white)
-                                        .font(.title)
+                                        .font(.system(size: 32))
                                 )
-                            Text("Play Latest")
-                                .font(.caption)
-                                .fontWeight(.medium)
+                            Text("Try Again")
+                                .font(.headline)
+                                .fontWeight(.semibold)
                         }
+                    }
+                } else {
+                    // Recording controls
+                    if speechViewModel.isRecording {
+                        // Show Stop button when recording
+                        Button(action: {
+                            speechViewModel.stopRecording()
+                            prompterViewModel.stopHighlighting()
+                        }) {
+                            VStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 100, height: 100)
+                                    .overlay(
+                                        Image(systemName: "stop.fill")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 32))
+                                    )
+                                Text("Stop")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        .disabled(!speechViewModel.hasCameraPermissions)
+                    } else {
+                        // Always show Record button when not recording and in camera mode
+                        Button(action: {
+                            showingResult = false
+                            resultViewModel.reset()
+                            prompterViewModel.resetHighlighting()
+                            prompterViewModel.startHighlighting()
+                            speechViewModel.startRecording()
+                            showingVideoPlayer = false
+                            speechViewModel.transcriptionText = ""
+                            speechViewModel.transcriptionError = nil
+                            speechViewModel.emotionResults = []
+                        }) {
+                            VStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 100, height: 100)
+                                    .overlay(
+                                        Image(systemName: "record.circle")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 32))
+                                    )
+                                Text("Record")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        .disabled(!speechViewModel.hasCameraPermissions)
                     }
                 }
             }
             .padding()
             
-            if !speechViewModel.recordedVideos.isEmpty {
+            // Previous recordings section (simplified)
+            if !speechViewModel.recordedVideos.isEmpty && !speechViewModel.isRecording {
                 VStack(alignment: .leading) {
                     HStack {
                         Text("Previous Recordings")
@@ -172,6 +223,9 @@ struct SpeechView: View {
                         Button("Delete All") {
                             speechViewModel.deleteAllRecordings()
                             showingVideoPlayer = false
+                            showingResult = false
+                            videoPlayer = nil
+                            isVideoPlaying = false
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
@@ -196,14 +250,17 @@ struct SpeechView: View {
                                     Spacer()
                                     
                                     HStack(spacing: 10) {
-                                        Button("Play") {
+                                        Button("View") {
                                             speechViewModel.lastRecordedVideoURL = url
                                             showingVideoPlayer = true
+                                            showingResult = false
+                                            videoPlayer = AVPlayer(url: url)
+                                            isVideoPlaying = false
                                         }
                                         .buttonStyle(.borderedProminent)
                                         .controlSize(.small)
                                         
-                                        Button("Transcribe") {
+                                        Button("Analyze") {
                                             selectedVideoForTranscription = url
                                             showingTranscriptionView = true
                                         }
@@ -214,8 +271,11 @@ struct SpeechView: View {
                                         
                                         Button("Delete") {
                                             speechViewModel.deleteRecording(url: url)
-                                            if speechViewModel.lastRecordedVideoURL == url { 
-                                                showingVideoPlayer = false 
+                                            if speechViewModel.lastRecordedVideoURL == url {
+                                                showingVideoPlayer = false
+                                                showingResult = false
+                                                videoPlayer = nil
+                                                isVideoPlaying = false
                                             }
                                         }
                                         .buttonStyle(.bordered)
@@ -243,13 +303,20 @@ struct SpeechView: View {
         }
         .onDisappear {
             speechViewModel.stopSession()
-            prompterViewModel.stopHighlighting() 
+            prompterViewModel.stopHighlighting()
+            videoPlayer?.pause()
         }
         .onChange(of: speechViewModel.lastRecordedVideoURL) { oldValue, newValue in
             if newValue != nil && !speechViewModel.isRecording {
                 showingVideoPlayer = true
+                if let url = newValue {
+                    videoPlayer = AVPlayer(url: url)
+                    isVideoPlaying = false
+                }
             } else if newValue == nil {
                 showingVideoPlayer = false
+                videoPlayer = nil
+                isVideoPlaying = false
             }
         }
         .onChange(of: prompterViewModel.prompterHasFinished) { oldValue, newValue in
@@ -259,21 +326,30 @@ struct SpeechView: View {
                 speechViewModel.stopRecording()
                }
         }
-        // REMOVE the previous .onChange(of: speechViewModel.transcriptionText) that sets showingResult
-
-        // REVISED: Rely primarily on isTranscribing finishing AFTER recording has stopped
         .onChange(of: speechViewModel.isTranscribing) { oldValue, newValue in
-            // newValue is the new state of isTranscribing
             print("🔄 isTranscribing changed from \(oldValue) to \(newValue)")
             print("📊 current transcriptionText: '\(speechViewModel.transcriptionText)'")
             print("🎬 current isRecording: \(speechViewModel.isRecording)")
             
-            // When transcription stops (newValue is false) AND recording has already stopped
-            if !newValue && !speechViewModel.isRecording {
-                print("🎯 Transcription finished and recording is stopped. Calculating score and showing result.")
+            // When transcription stops AND recording has stopped AND emotion analysis is complete
+            if !newValue && !speechViewModel.isRecording && !speechViewModel.isAnalyzingEmotion {
+                print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
                 resultViewModel.calculateScore(
-                    transcribedText: speechViewModel.transcriptionText, // This can be empty
-                    expectedText: prompterViewModel.prompter.script
+                    transcribedText: speechViewModel.transcriptionText,
+                    expectedText: prompterViewModel.prompter.script,
+                    emotionResults: speechViewModel.emotionResults
+                )
+                showingResult = true
+            }
+        }
+        .onChange(of: speechViewModel.isAnalyzingEmotion) { oldValue, newValue in
+            // When emotion analysis stops AND transcription has stopped AND recording has stopped
+            if !newValue && !speechViewModel.isTranscribing && !speechViewModel.isRecording {
+                print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
+                resultViewModel.calculateScore(
+                    transcribedText: speechViewModel.transcriptionText,
+                    expectedText: prompterViewModel.prompter.script,
+                    emotionResults: speechViewModel.emotionResults
                 )
                 showingResult = true
             }
@@ -281,7 +357,7 @@ struct SpeechView: View {
         .sheet(isPresented: $showingTranscriptionView) {
             TranscriptionView(
                 videoURL: selectedVideoForTranscription,
-                viewModel: speechViewModel 
+                viewModel: speechViewModel
             )
             .frame(minWidth: 800, minHeight: 600)
             .presentationDetents([.large])
@@ -333,7 +409,7 @@ struct TranscriptionView: View {
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
-            .background(Color(NSColor.controlBackgroundColor)) 
+            .background(Color(NSColor.controlBackgroundColor))
             
             Divider()
          
@@ -376,7 +452,7 @@ struct TranscriptionView: View {
                                         .cornerRadius(10)
                                         .textSelection(.enabled)
                                 }
-                                .frame(minHeight: 100, maxHeight: .infinity) // Allow it to grow
+                                .frame(minHeight: 100, maxHeight: .infinity)
                                 .background(Color.gray.opacity(0.05))
                                 .cornerRadius(10)
                             }
@@ -437,7 +513,6 @@ struct TranscriptionView: View {
         .onAppear {
             if let url = videoURL, !viewModel.isTranscribing, viewModel.transcriptionText.isEmpty {
                 viewModel.transcribeVideo(url: url)
-//                test mlmodel
                 viewModel.detectEmotion(url: url)
             }
         }
@@ -452,8 +527,8 @@ struct CameraPreview: NSViewRepresentable {
         view.wantsLayer = true
         
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.videoGravity = .resizeAspectFill 
-        previewLayer.frame = view.bounds 
+        previewLayer.videoGravity = .resizeAspectFill
+        previewLayer.frame = view.bounds
         view.layer = previewLayer
         
         return view
@@ -461,9 +536,9 @@ struct CameraPreview: NSViewRepresentable {
     
     func updateNSView(_ nsView: NSView, context: Context) {
         if let layer = nsView.layer as? AVCaptureVideoPreviewLayer {
-            layer.session = session 
+            layer.session = session
             
-            DispatchQueue.main.async { 
+            DispatchQueue.main.async {
                  if layer.frame != nsView.bounds {
                     layer.frame = nsView.bounds
                 }
