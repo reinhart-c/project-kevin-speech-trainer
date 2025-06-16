@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct CategoryCardView: View {
-   //@StateObject private var viewModel = CategoryViewModel()
     let category: Category
     @Binding var path: NavigationPath
 

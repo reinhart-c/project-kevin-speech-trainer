@@ -24,7 +24,6 @@ struct CategoryCardListView: View {
                     .frame(width: 650, height: 230)
             }
         }
-        .padding(50)
     }
 }
 

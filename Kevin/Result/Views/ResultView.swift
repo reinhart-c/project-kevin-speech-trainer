@@ -132,7 +132,10 @@ struct ResultView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            
+            
         }
+        
         .frame(width: 300)
         .padding()
         .background(Color.gray.opacity(0.1))
