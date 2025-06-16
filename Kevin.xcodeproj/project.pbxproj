@@ -6,8 +6,26 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7A224B2F2DFD7CF5004DFFB3 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 7A224B2E2DFD7CF5004DFFB3 /* Lottie */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7A224A782DFD7710004DFFB3 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		558105DA2DFAB053000C21AB /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
+		CB3CADD92E000634006BA58D /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBC32DD52DF80DDD007B00B1 /* Kevin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kevin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBDC3CDD2DF984750051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBDC3D092DFAB4A00051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
@@ -26,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A224B2F2DFD7CF5004DFFB3 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +52,11 @@
 
 /* Begin PBXGroup section */
 		558105DD2DFAB053000C21AB /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CB3CADDD2E000634006BA58D /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -73,6 +97,7 @@
 				CBC32DD12DF80DDD007B00B1 /* Sources */,
 				CBC32DD22DF80DDD007B00B1 /* Frameworks */,
 				CBC32DD32DF80DDD007B00B1 /* Resources */,
+				7A224A782DFD7710004DFFB3 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -83,6 +108,7 @@
 			);
 			name = Kevin;
 			packageProductDependencies = (
+				7A224B2E2DFD7CF5004DFFB3 /* Lottie */,
 			);
 			productName = Kevin;
 			productReference = CBC32DD52DF80DDD007B00B1 /* Kevin.app */;
@@ -112,6 +138,9 @@
 			);
 			mainGroup = CBC32DCC2DF80DDD007B00B1;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7A224B2D2DFD7CF5004DFFB3 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CBC32DD62DF80DDD007B00B1 /* Products */;
 			projectDirPath = "";
@@ -123,6 +152,10 @@
 				{
 					ProductGroup = 558105DD2DFAB053000C21AB /* Products */;
 					ProjectRef = 558105DA2DFAB053000C21AB /* Kevin.xcodeproj */;
+				},
+				{
+					ProductGroup = CB3CADDD2E000634006BA58D /* Products */;
+					ProjectRef = CB3CADD92E000634006BA58D /* Kevin.xcodeproj */;
 				},
 				{
 					ProductGroup = CBDC3D0C2DFAB4A00051B96A /* Products */;
@@ -361,6 +394,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7A224B2D2DFD7CF5004DFFB3 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7A224B2E2DFD7CF5004DFFB3 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A224B2D2DFD7CF5004DFFB3 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CBC32DCD2DF80DDD007B00B1 /* Project object */;
 }
