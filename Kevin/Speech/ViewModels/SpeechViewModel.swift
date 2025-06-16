@@ -33,6 +33,10 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     private var recognitionRequest: SFSpeechURLRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
 
+    // Add emotion detection properties
+    @Published var emotionResults: [VoiceEmotionClassifierOutput] = []
+    @Published var isAnalyzingEmotion = false
+
     override init() {
         super.init()
         loadRecordings() // Load existing recordings on init
@@ -166,7 +170,10 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
                 self.lastRecordedVideoURL = outputFileURL
                 self.recordedVideos.append(outputFileURL)
                 self.sortRecordings()
-                self.transcribeVideo(url: outputFileURL) 
+                
+                // Start both transcription and emotion detection
+                self.transcribeVideo(url: outputFileURL)
+                self.detectEmotion(url: outputFileURL)
             }
         }
     }
@@ -386,17 +393,31 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     }
 
     
-    func detectEmotion(url: URL){
-        do {
-            let results = try loadAudioSamplesAndPredict(videoURL: url)
-            for (i, result) in results.enumerated() {
-                print("Prediction \(i + 1): \(result.target)")
-                for (label, prob) in result.targetProbability.sorted(by: { $0.value > $1.value }) {
-                    print("  - \(label): \(String(format: "%.2f", prob * 100))%")
+    func detectEmotion(url: URL) {
+        isAnalyzingEmotion = true
+        
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            do {
+                let results = try self?.loadAudioSamplesAndPredict(videoURL: url) ?? []
+                
+                DispatchQueue.main.async {
+                    self?.emotionResults = results
+                    self?.isAnalyzingEmotion = false
+                    
+                    // Log results for debugging
+                    for (i, result) in results.enumerated() {
+                        print("Prediction \(i + 1): \(result.target)")
+                        for (label, prob) in result.targetProbability.sorted(by: { $0.value > $1.value }) {
+                            print("  - \(label): \(String(format: "%.2f", prob * 100))%")
+                        }
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.isAnalyzingEmotion = false
+                    print("Error during emotion detection: \(error)")
                 }
             }
-        } catch {
-            print("Error during prediction: \(error)")
         }
     }
 }
