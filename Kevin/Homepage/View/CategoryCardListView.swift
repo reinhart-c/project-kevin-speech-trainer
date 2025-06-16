@@ -8,18 +8,19 @@ import SwiftUI
 
 struct CategoryCardListView: View {
     @StateObject private var viewModel = CategoryViewModel()
+    @Binding var path: NavigationPath
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             // First card (big one)
-            CategoryCardView(category: viewModel.categories[0])
+            CategoryCardView(category: viewModel.categories[0], path: $path)
                 .frame(width: 700, height: 477)
 
             // Stacked cards
             VStack(spacing: 16) {
-                CategoryCardView(category: viewModel.categories[1])
+                CategoryCardView(category: viewModel.categories[1], path: $path)
                     .frame(width: 650, height: 230)
-                CategoryCardView(category: viewModel.categories[2])
+                CategoryCardView(category: viewModel.categories[2], path: $path)
                     .frame(width: 650, height: 230)
             }
         }
@@ -28,5 +29,5 @@ struct CategoryCardListView: View {
 }
 
 #Preview {
-    CategoryCardListView()
+//    CategoryCardListView()
 }

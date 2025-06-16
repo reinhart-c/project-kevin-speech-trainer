@@ -11,6 +11,7 @@ import SwiftUI
 struct CategoryCardView: View {
    //@StateObject private var viewModel = CategoryViewModel()
     let category: Category
+    @Binding var path: NavigationPath
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -82,6 +83,9 @@ struct CategoryCardView: View {
             .background(Color.white.opacity(0.8))
             .clipShape(Capsule())
             .padding([.top, .trailing], 28)
+            .onTapGesture {
+                path.append("SpeechView")
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(category.backgroundColor)
@@ -91,13 +95,13 @@ struct CategoryCardView: View {
 }
 
 #Preview {
-    CategoryCardView(category: Category(
-        title: "Lead with purpose, speak with power",
-        subtitle: "Deliver powerful messages that move people",
-        tag: "Political",
-        backgroundColor: Color.lightPink,
-        icon: "flame"
-    ))
-    .padding()
+//    CategoryCardView(category: Category(
+//        title: "Lead with purpose, speak with power",
+//        subtitle: "Deliver powerful messages that move people",
+//        tag: "Political",
+//        backgroundColor: Color.lightPink,
+//        icon: "flame"
+//    ))
+//    .padding()
     //.previewLayout(.sizeThatFits)
 }

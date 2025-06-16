@@ -9,53 +9,80 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel = CategoryViewModel()
+    @StateObject private var speechViewModel = SpeechViewModel()
+    @State private var path = NavigationPath()
     var body: some View {
-        ScrollView {
-            VStack {
-                HStack {
-                    (
-                        Text("**“Say It”**")
-                            .foregroundStyle(
-                                LinearGradient(colors: [.purpleTitle, .blueTitle], startPoint: .leading, endPoint: .trailing))
-                        
-                        + Text(" Better,\nMove Them Further!")
-                            .foregroundColor(.primary)
-                       
-                    )
-                    .bold()
-                    .font(.system(size: 48))
-                    .padding(.top, 20)
-                    .padding(.leading, 40)
-                    
-                    Spacer()
-                    
-                    Streak()
+        NavigationStack(path: $path) {
+            ScrollView {
+                VStack {
+                    HStack {
+                        (
+                            Text("**“Say It”**")
+                                .foregroundStyle(
+                                    LinearGradient(colors: [.purpleTitle, .blueTitle], startPoint: .leading, endPoint: .trailing))
+                            
+                            + Text(" Better,\nMove Them Further!")
+                                .foregroundColor(.primary)
+                            
+                        )
+                        .bold()
+                        .font(.system(size: 48))
                         .padding(.top, 20)
-                        .padding(.trailing, 20)
+                        .padding(.leading, 40)
+                        
+                        Spacer()
+                        
+                        Streak()
+                            .padding(.top, 20)
+                            .padding(.trailing, 20)
+                    }
+                    .padding()
+                    
+                    CategoryCardListView(path: $path)
+                        .padding(.top, -30)
+                    
+                    HStack {
+                        Text("Your Progress")
+                            .padding(.horizontal)
+                            .padding(.leading, 40)
+                            .bold()
+                            .font(.system(size: 28))
+                        
+                        Spacer()
+                        SearchBarView()
+                            .padding(.trailing, 40)
+                    }
+                    ScrollView {
+                        LazyVStack {
+                            ForEach(speechViewModel.recordedVideos, id: \.self) { url in
+                                let index = speechViewModel.recordedVideos.firstIndex(of: url) ?? -1
+                                ProgressItem(title: "Recording \(speechViewModel.recordedVideos.count - index)", date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
+                            }
+                        }
+                    }
                 }
                 .padding()
-                
-                CategoryCardListView()
-                    .padding(.top, -30)
-                
-                HStack {
-                    Text("Your Progress")
-                        .padding(.horizontal)
-                        .padding(.leading, 40)
-                        .bold()
-                        .font(.system(size: 28))
-                    
-                    Spacer()
-                    SearchBarView()
-                        .padding(.trailing, 40)
-                }
-                ProgressItem(title: "This is my first practice to present product", date: "12 March 2024, 20:00", categoryName: "Political", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
-                ProgressItem(title: "This is my first practice to present product", date: "12 March 2024, 20:00", categoryName: "Political", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
-                ProgressItem(title: "This is my first practice to present product", date: "12 March 2024, 20:00", categoryName: "Political", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
-                ProgressItem(title: "This is my first practice to present product", date: "12 March 2024, 20:00", categoryName: "Political", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
+            }.onAppear {
+                speechViewModel.loadRecordings()
             }
-            .padding()
+            .navigationDestination(for: String.self) { val in
+                if val == "SpeechView" {
+                    SpeechView()
+                }
+            }
         }
+    }
+    
+    private func formatDate(from url: URL) -> String {
+        let filename = url.lastPathComponent
+        if let timeInterval = Double(filename.replacingOccurrences(of: "recording_", with: "").replacingOccurrences(of: ".mov", with: "")) {
+            let date = Date(timeIntervalSince1970: timeInterval)
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .short
+            return formatter.string(from: date)
+        }
+        return url.lastPathComponent
     }
 }
 
