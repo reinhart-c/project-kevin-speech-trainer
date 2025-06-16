@@ -1,0 +1,93 @@
+//
+//  CategoryModalView.swift
+//  Kevin
+//
+//  Created by Alifa Reppawali on 16/06/25.
+//
+
+import SwiftUI
+
+struct CategoryModalView: View {
+    var category: Category
+    var onReady: () -> Void
+    
+    @State private var title: String = ""
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Before you begin…")
+                .font(.title.bold())
+                .foregroundStyle(Color.black)
+                .padding(.top, 10)
+
+            Text("Name your speech practice first!")
+                .foregroundColor(.gray)
+                .padding(.bottom, 10)
+
+            TextField("Practice Title", text: $title)
+                .padding()
+                .textFieldStyle(PlainTextFieldStyle())
+                .background(
+                    Color.white
+                        .clipShape(RoundedRectangle(cornerRadius: 30))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 30)
+                        .stroke(Color.gray.opacity(0.3))
+                )
+                .frame(width: 500)
+                .foregroundStyle(Color.black)
+            
+
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.white)
+                .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.lightGrey))
+                .foregroundColor(.gray)
+                .font(.system(size: 18))
+                .buttonStyle(PlainButtonStyle())
+                .frame(width: 180)
+                
+                Spacer()
+                
+                Button("I’m Ready") {
+                    // Save to history here
+                    // Then navigate
+                    onReady()
+                    dismiss()
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .font(.system(size: 18))
+                .background(Color.black)
+                .foregroundColor(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 30))
+                .buttonStyle(PlainButtonStyle())
+                .frame(width: 180)
+            }
+            .padding(.horizontal)
+        }
+        .padding()
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .padding()
+    }
+}
+
+//#Preview {
+//    CategoryModalView(
+//        category: Category(
+//            title: "Product deserves the spotlight",
+//            subtitle: "Deliver product pitches that build trust and interest",
+//            tag: "Product",
+//            backgroundColor: Color.lightBlue,
+//            icon: "lightbulb.max"
+//        ),
+//        onReady: {}
+//    )
+//}

@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct CategoryCardView: View {
-   //@StateObject private var viewModel = CategoryViewModel()
     let category: Category
 
     var body: some View {

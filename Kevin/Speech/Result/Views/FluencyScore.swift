@@ -10,10 +10,6 @@ import SwiftUI
 struct FluencyScore: View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
             
             RadarView(dataPoints: [
                 RadarModel(label: "Happy", value: 0.2),

@@ -63,23 +63,6 @@ struct SpeechView: View {
                         .cornerRadius(15)
                     }
                 }
-                
-                // Overlay message when no camera access
-                if !viewModel.hasCameraPermissions {
-                    VStack {
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 50))
-                            .foregroundColor(.gray)
-                        Text("Camera access required")
-                            .font(.headline)
-                            .foregroundColor(.gray)
-                        Text("Please grant camera and microphone access in Settings.")
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                    }
-                }
-                .frame(height: 400)
 
                 // Show ResultView instead of PrompterView when recording is finished and we have results
                 if showingResult {
