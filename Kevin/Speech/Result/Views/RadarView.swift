@@ -114,9 +114,8 @@ struct RadarView: View {
         case "happy", "joy": return .yellow
         case "sad", "sadness": return .blue
         case "angry", "anger": return .red
-        case "fear": return .purple
+        case "fearful", "fear": return .purple  
         case "disgust": return .green
-        case "surprise": return .orange
         case "neutral": return .gray
         default: return .secondary
         }

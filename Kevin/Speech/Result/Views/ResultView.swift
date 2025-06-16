@@ -173,7 +173,8 @@ struct ResultView: View {
     }
     
     private func createRadarDataPoints(from emotionBreakdown: [String: Double]) -> [RadarModel] {
-        let emotionOrder = ["happy", "sad", "angry", "fear", "disgust", "surprise", "neutral"]
+        // Updated to match the 6 emotions from the ML model
+        let emotionOrder = ["happy", "sad", "angry", "fearful", "disgust", "neutral"]
         
         return emotionOrder.compactMap { emotion in
             // Find matching emotion (case insensitive)
@@ -192,9 +193,8 @@ struct ResultView: View {
         case "happy", "joy": return .yellow
         case "sad", "sadness": return .blue
         case "angry", "anger": return .red
-        case "fear": return .purple
+        case "fearful", "fear": return .purple  // Updated to match "fearful"
         case "disgust": return .green
-        case "surprise": return .orange
         case "neutral": return .gray
         default: return .secondary
         }

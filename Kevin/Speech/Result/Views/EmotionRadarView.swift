@@ -7,15 +7,14 @@
 
 import SwiftUI
 
+// Update to match the actual ML model output (6 emotions)
 enum EmotionCase: String, CaseIterable {
     case angry = "Angry"
-    case calm = "Calm"
     case disgust = "Disgust"
-    case fearful = "Fearful"
+    case fearful = "Fearful" 
     case happy = "Happy"
     case neutral = "Neutral"
     case sad = "Sad"
-    case surprised = "Surprised"
 }
 
 struct EmotionDataPoint: Identifiable {
@@ -23,26 +22,42 @@ struct EmotionDataPoint: Identifiable {
     var entries: [EmotionEntry]
     var color: Color
     
-    init(angry: Double, calm: Double, disgust: Double, fearful: Double, 
-         happy: Double, neutral: Double, sad: Double, surprised: Double, color: Color) {
+    // Update constructor for 6 emotions
+    init(angry: Double, disgust: Double, fearful: Double, 
+         happy: Double, neutral: Double, sad: Double, color: Color) {
         self.entries = [
             EmotionEntry(emotionCase: .angry, value: angry),
-            EmotionEntry(emotionCase: .calm, value: calm),
             EmotionEntry(emotionCase: .disgust, value: disgust),
             EmotionEntry(emotionCase: .fearful, value: fearful),
             EmotionEntry(emotionCase: .happy, value: happy),
             EmotionEntry(emotionCase: .neutral, value: neutral),
-            EmotionEntry(emotionCase: .sad, value: sad),
-            EmotionEntry(emotionCase: .surprised, value: surprised)
+            EmotionEntry(emotionCase: .sad, value: sad)
         ]
         self.color = color
     }
     
     init(emotionBreakdown: [String: Double], color: Color) {
         self.entries = EmotionCase.allCases.map { emotionCase in
-            let value = emotionBreakdown.first(where: { 
-                $0.key.lowercased() == emotionCase.rawValue.lowercased() 
+            // Try multiple variations to match ML model output
+            let value = emotionBreakdown.first(where: { key, _ in
+                let keyLower = key.lowercased()
+                let caseLower = emotionCase.rawValue.lowercased()
+                
+                // Direct match
+                if keyLower == caseLower {
+                    return true
+                }
+                
+                // Handle "Fear" vs "Fearful" mismatch
+                if (keyLower == "fear" && caseLower == "fearful") ||
+                   (keyLower == "fearful" && caseLower == "fear") {
+                    return true
+                }
+                
+                // Add other potential mismatches if needed
+                return false
             })?.value ?? 0.0
+            
             return EmotionEntry(emotionCase: emotionCase, value: value)
         }
         self.color = color
@@ -367,9 +382,7 @@ struct EmotionRadarView: View {
         case "angry": return .red
         case "fearful": return .purple
         case "disgust": return .green
-        case "surprised": return .orange
         case "neutral": return .gray
-        case "calm": return .cyan
         default: return .secondary
         }
     }
@@ -388,16 +401,14 @@ func degAngle_fromFraction(numerator: Int, denominator: Int) -> CGFloat {
     return 360 * (CGFloat(numerator)/CGFloat(denominator))
 }
 
-// Default dimensions for 8 emotions
+// Updated dimensions for 6 emotions only
 let emotionDimensions = [
     EmotionDimension(maxVal: 100, emotionCase: .angry),
-    EmotionDimension(maxVal: 100, emotionCase: .calm),
     EmotionDimension(maxVal: 100, emotionCase: .disgust),
     EmotionDimension(maxVal: 100, emotionCase: .fearful),
     EmotionDimension(maxVal: 100, emotionCase: .happy),
     EmotionDimension(maxVal: 100, emotionCase: .neutral),
-    EmotionDimension(maxVal: 100, emotionCase: .sad),
-    EmotionDimension(maxVal: 100, emotionCase: .surprised)
+    EmotionDimension(maxVal: 100, emotionCase: .sad)
 ]
 
 #Preview {
@@ -409,8 +420,8 @@ let emotionDimensions = [
         dimensions: emotionDimensions,
         data: [
             EmotionDataPoint(
-                angry: 20, calm: 10, disgust: 5, fearful: 60,
-                happy: 15, neutral: 25, sad: 30, surprised: 10,
+                angry: 20, disgust: 5, fearful: 60,
+                happy: 15, neutral: 25, sad: 30,
                 color: .blue
             )
         ]
