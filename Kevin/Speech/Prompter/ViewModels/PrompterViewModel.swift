@@ -43,20 +43,19 @@ class PrompterViewModel: ObservableObject {
     
     func startHighlighting() {
         if words.isEmpty {
-            prompterHasFinished = true // If no words, it's immediately finished
+            prompterHasFinished = true
             return
         }
-        stopHighlighting() // Ensure any existing timer is stopped
         currentWordIndex = -1
-        prompterHasFinished = false // Reset finished flag
+        prompterHasFinished = false
         
         scriptTimer = Timer.scheduledTimer(withTimeInterval: highlightingSpeed, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             if self.currentWordIndex < self.words.count - 1 {
                 self.currentWordIndex += 1
             } else {
-                self.prompterHasFinished = true // Signal prompter finished
-                self.stopHighlighting() // Stop when end of script is reached
+                self.prompterHasFinished = true
+                self.stopHighlighting() 
             }
         }
     }
