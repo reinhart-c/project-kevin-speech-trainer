@@ -222,7 +222,6 @@ struct SpeechView: View {
             }
             .padding()
             
-            // Previous recordings section (simplified)
             if !speechViewModel.recordedVideos.isEmpty && !speechViewModel.isRecording {
                 VStack(alignment: .leading) {
                     HStack {
@@ -317,12 +316,23 @@ struct SpeechView: View {
             prompterViewModel.stopHighlighting()
             videoPlayer?.pause()
         }
+        .onChange(of: speechViewModel.isRecording) { oldValue, newValue in
+            if !newValue && oldValue && speechViewModel.lastRecordedVideoURL != nil {
+                if let url = speechViewModel.lastRecordedVideoURL {
+                    videoPlayer = AVPlayer(url: url) 
+                    isVideoPlaying = false 
+                }
+                showingResult = true
+            }
+        }
         .onChange(of: speechViewModel.lastRecordedVideoURL) { oldValue, newValue in
             if newValue != nil && !speechViewModel.isRecording {
-                showingVideoPlayer = true
-                if let url = newValue {
-                    videoPlayer = AVPlayer(url: url)
-                    isVideoPlaying = false
+                if !showingVideoPlayer { 
+                    showingVideoPlayer = true
+                    if let url = newValue {
+                        videoPlayer = AVPlayer(url: url)
+                        isVideoPlaying = false
+                    }
                 }
             } else if newValue == nil {
                 showingVideoPlayer = false
@@ -342,27 +352,29 @@ struct SpeechView: View {
             print("📊 current transcriptionText: '\(speechViewModel.transcriptionText)'")
             print("🎬 current isRecording: \(speechViewModel.isRecording)")
             
-            // When transcription stops AND recording has stopped AND emotion analysis is complete
             if !newValue && !speechViewModel.isRecording && !speechViewModel.isAnalyzingEmotion {
-                print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
+                print("🎯 Both transcription and emotion analysis finished. Calculating score.")
                 resultViewModel.calculateScore(
                     transcribedText: speechViewModel.transcriptionText,
                     expectedText: prompterViewModel.prompter.script,
                     emotionResults: speechViewModel.emotionResults
                 )
-                showingResult = true
+                if !showingResult && speechViewModel.lastRecordedVideoURL != nil { 
+                    showingResult = true
+                }
             }
         }
         .onChange(of: speechViewModel.isAnalyzingEmotion) { oldValue, newValue in
-            // When emotion analysis stops AND transcription has stopped AND recording has stopped
             if !newValue && !speechViewModel.isTranscribing && !speechViewModel.isRecording {
-                print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
+                print("🎯 Both transcription and emotion analysis finished. Calculating score.")
                 resultViewModel.calculateScore(
                     transcribedText: speechViewModel.transcriptionText,
                     expectedText: prompterViewModel.prompter.script,
                     emotionResults: speechViewModel.emotionResults
                 )
-                showingResult = true
+                if !showingResult && speechViewModel.lastRecordedVideoURL != nil { 
+                    showingResult = true
+                }
             }
         }
         .sheet(isPresented: $showingTranscriptionView) {
