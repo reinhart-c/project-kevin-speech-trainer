@@ -1,9 +1,9 @@
-//
-//  .swiftlint.yml
-//  Kevin
-//
-//  Created by Reinhart on 17/06/25.
-//
+#//
+#//  .swiftlint.yml
+#//  Kevin
+#//
+#//  Created by Reinhart on 17/06/25.
+#//
 
 disabled_rules:
   - trailing_whitespace        # Disable warning/error for trailing spaces at line ends

@@ -336,7 +336,10 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             let length = CMBlockBufferGetDataLength(blockBuffer)
             var buffer = [Float](repeating: 0, count: length / MemoryLayout<Float>.size)
             buffer.withUnsafeMutableBytes {
-                CMBlockBufferCopyDataBytes(blockBuffer, atOffset: 0, dataLength: length, destination: $0.baseAddress!)
+                guard let baseAddress = $0.baseAddress else {
+                    return
+                }
+                CMBlockBufferCopyDataBytes(blockBuffer, atOffset: 0, dataLength: length, destination: baseAddress)
             }
             audioData.append(contentsOf: buffer)
         }
@@ -346,19 +349,36 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
         }
 
         // Set up AVAudioConverter to resample to 16kHz mono
-        let inputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 48000.0, channels: 1, interleaved: false)!
-        let outputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 16000.0, channels: 1, interleaved: false)!
+        guard
+            let inputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 48000.0, channels: 1, interleaved: false),
+            let outputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 16000.0, channels: 1, interleaved: false)
+        else {
+            throw NSError(domain: "AudioError", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failed to create AVAudioFormat"])
+        }
         let inputFrameCount = AVAudioFrameCount(audioData.count)
-        let inputBuffer = AVAudioPCMBuffer(pcmFormat: inputFormat, frameCapacity: inputFrameCount)!
+        guard let inputBuffer = AVAudioPCMBuffer(pcmFormat: inputFormat, frameCapacity: inputFrameCount) else {
+            throw NSError(domain: "AudioError", code: 4, userInfo: [NSLocalizedDescriptionKey: "Failed to create AVAudioPCMBuffer"])
+        }
         inputBuffer.frameLength = inputFrameCount
         audioData.withUnsafeBufferPointer {
-            inputBuffer.floatChannelData!.pointee.assign(from: $0.baseAddress!, count: Int(inputFrameCount))
+            guard
+                let floatChannelData = inputBuffer.floatChannelData,
+                let baseAddress = $0.baseAddress
+            else {
+                return
+            }
+
+            floatChannelData.pointee.assign(from: baseAddress, count: Int(inputFrameCount))
         }
 
-        let converter = AVAudioConverter(from: inputFormat, to: outputFormat)!
+        guard let converter = AVAudioConverter(from: inputFormat, to: outputFormat) else {
+            throw NSError(domain: "AudioError", code: 5, userInfo: [NSLocalizedDescriptionKey: "Failed to create AVAudioConverter"])
+        }
         let ratio = outputFormat.sampleRate / inputFormat.sampleRate
         let outputFrameCapacity = AVAudioFrameCount(Double(inputFrameCount) * ratio)
-        let outputBuffer = AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: outputFrameCapacity)!
+        guard let outputBuffer = AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: outputFrameCapacity) else {
+            throw NSError(domain: "AudioError", code: 6, userInfo: [NSLocalizedDescriptionKey: "Failed to create AVAudioPCMBuffer"])
+        }
         var error: NSError?
         converter.convert(to: outputBuffer, error: &error) { _, outStatus in
             outStatus.pointee = .haveData
@@ -370,7 +390,10 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
         }
 
         // Get the resampled data as [Float]
-        let resampledData = Array(UnsafeBufferPointer(start: outputBuffer.floatChannelData![0],
+        guard let floatChannelData = outputBuffer.floatChannelData else {
+            throw NSError(domain: "AudioError", code: 7, userInfo: [NSLocalizedDescriptionKey: "Failed to get floatChannelData"])
+        }
+        let resampledData = Array(UnsafeBufferPointer(start: floatChannelData[0],
                                                       count: Int(outputBuffer.frameLength)))
 
         // Prepare sliding windows
