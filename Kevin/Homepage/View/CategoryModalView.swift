@@ -41,34 +41,36 @@ struct CategoryModalView: View {
             
 
             HStack {
-                Button("Cancel") {
+                Button {
                     dismiss()
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.white)
-                .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.lightGrey))
-                .foregroundColor(.gray)
-                .font(.system(size: 18))
-                .buttonStyle(PlainButtonStyle())
-                .frame(width: 180)
+                } label: {
+                    Text("Cancel")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.white)
+                        .overlay(RoundedRectangle(cornerRadius: 999).stroke(Color.lightGrey))
+                        .foregroundColor(.gray)
+                        .font(.system(size: 18))
+                        .buttonStyle(PlainButtonStyle())
+                        .frame(width: 180)
+                }.buttonStyle(.plain)
                 
                 Spacer()
                 
-                Button("I’m Ready") {
-                    // Save to history here
-                    // Then navigate
+                Button {
                     onReady()
                     dismiss()
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .font(.system(size: 18))
-                .background(Color.black)
-                .foregroundColor(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 30))
-                .buttonStyle(PlainButtonStyle())
-                .frame(width: 180)
+                } label: {
+                    Text("I'm Ready")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.black)
+                        .foregroundColor(.white)
+                        .font(.system(size: 18))
+                        .buttonStyle(PlainButtonStyle())
+                        .frame(width: 180)
+                        .cornerRadius(999)
+                }.buttonStyle(.plain)
             }
             .padding(.horizontal)
         }
@@ -79,15 +81,15 @@ struct CategoryModalView: View {
     }
 }
 
-//#Preview {
-//    CategoryModalView(
-//        category: Category(
-//            title: "Product deserves the spotlight",
-//            subtitle: "Deliver product pitches that build trust and interest",
-//            tag: "Product",
-//            backgroundColor: Color.lightBlue,
-//            icon: "lightbulb.max"
-//        ),
-//        onReady: {}
-//    )
-//}
+#Preview {
+    CategoryModalView(
+        category: Category(
+            title: "Product deserves the spotlight",
+            subtitle: "Deliver product pitches that build trust and interest",
+            tag: "Product",
+            backgroundColor: Color.lightBlue,
+            icon: "lightbulb.max"
+        ),
+        onReady: {}
+    )
+}
