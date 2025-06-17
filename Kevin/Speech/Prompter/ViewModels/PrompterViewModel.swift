@@ -13,12 +13,11 @@ class PrompterViewModel: ObservableObject {
     @Published var prompter: Prompter
     @Published var words: [String] = []
     @Published var currentWordIndex: Int = -1
-    @Published var prompterHasFinished: Bool = false // New: To signal when prompter is done
+    @Published var prompterHasFinished: Bool = false 
     
     private var scriptTimer: Timer?
-    private let highlightingSpeed: TimeInterval = 0.5 // Seconds per word
+    private let highlightingSpeed: TimeInterval = 0.5
     
-    // Allow script injection for flexibility, with a default
     init(script: String = """
         Every once in a while, a revolutionary product comes along that changes everything and
         Apple has been... well, first of all, one’s very fortunate if you get to work on just one of these
@@ -34,7 +33,6 @@ class PrompterViewModel: ObservableObject {
         """) {
         self.prompter = Prompter(script: script)
         self.words = tokenizeScript(script)
-        // Highlighting will be started externally now
     }
     
     private func tokenizeScript(_ script: String) -> [String] {

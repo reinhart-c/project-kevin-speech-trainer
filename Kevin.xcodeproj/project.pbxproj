@@ -26,6 +26,7 @@
 /* Begin PBXFileReference section */
 		558105DA2DFAB053000C21AB /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CB3CADD92E000634006BA58D /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
+		CB6F70E62E01464F00359D05 /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBC32DD52DF80DDD007B00B1 /* Kevin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kevin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBDC3CDD2DF984750051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBDC3D092DFAB4A00051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
@@ -57,6 +58,11 @@
 			sourceTree = "<group>";
 		};
 		CB3CADDD2E000634006BA58D /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CB6F70EA2E01464F00359D05 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -160,6 +166,10 @@
 				{
 					ProductGroup = CBDC3D0C2DFAB4A00051B96A /* Products */;
 					ProjectRef = CBDC3D092DFAB4A00051B96A /* Kevin.xcodeproj */;
+				},
+				{
+					ProductGroup = CB6F70EA2E01464F00359D05 /* Products */;
+					ProjectRef = CB6F70E62E01464F00359D05 /* Kevin.xcodeproj */;
 				},
 			);
 			projectRoot = "";
