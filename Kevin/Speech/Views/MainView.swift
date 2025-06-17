@@ -8,24 +8,24 @@
 import SwiftUI
 
 struct MainView: View {
-    
+
     @StateObject var speechViewModel = SpeechViewModel()
     @State private var showConfirmationModal = false
     @State private var confirmationAction: ConfirmationModalView.ActionType?
     @State private var dontAskAgain = false
-    
+
     var body: some View {
         VStack {
             HStack {
-                Text("Product deserves the spotlight") //category.title
+                Text("Product deserves the spotlight") // category.title
                     .font(.system(size: 30, weight: .semibold))
                     .padding(.leading, 40)
-                
+
                 Spacer()
-                
-                //retry
-                Button{
-                    //retry session
+
+                // retry
+                Button {
+                    // retry session
                     if dontAskAgain {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
@@ -35,15 +35,15 @@ struct MainView: View {
                         showConfirmationModal = true
                     }
 
-                } label:{
+                } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                         .font(.system(size: 30))
                 }
                 .buttonStyle(PlainButtonStyle())
-                
-                //end
-                Button{
-                    //endSession
+
+                // end
+                Button {
+                    // endSession
                     if dontAskAgain {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
@@ -51,8 +51,8 @@ struct MainView: View {
                         confirmationAction = .endSession
                         showConfirmationModal = true
                     }
-                    
-                } label:{
+
+                } label: {
                     Text("End Session")
                         .foregroundStyle(.white)
                         .font(.system(size: 20))
@@ -65,13 +65,13 @@ struct MainView: View {
                 ProgressBar()
                     .padding(.trailing, 40)
             }
-            
+
             HStack {
                 SpeechView()
             }
         }
         .padding()
-        
+
         .sheet(item: $confirmationAction) { action in
             ConfirmationModalView(
                 actionType: action,
@@ -95,7 +95,6 @@ struct MainView: View {
 
     }
 }
-
 
 #Preview {
     MainView()

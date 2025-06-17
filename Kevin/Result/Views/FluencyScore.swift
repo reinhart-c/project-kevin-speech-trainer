@@ -10,8 +10,7 @@ import SwiftUI
 struct FluencyScore: View {
     var body: some View {
         VStack {
-            
-            
+
             RadarView(dataPoints: [
                 RadarModel(label: "Happy", value: 0.2),
                 RadarModel(label: "Fear", value: 0.8),
@@ -28,4 +27,3 @@ struct FluencyScore: View {
 #Preview {
     FluencyScore()
 }
-

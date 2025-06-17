@@ -5,7 +5,6 @@
 //  Created by Alifa Reppawali on 12/06/25.
 //
 
-
 import SwiftUI
 
 struct CategoryCardView: View {
@@ -14,8 +13,8 @@ struct CategoryCardView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            
-            //background icon
+
+            // background icon
             if category.tag == "Product" {
                 Image(systemName: category.icon)
                     .resizable()
@@ -24,8 +23,7 @@ struct CategoryCardView: View {
                     .frame(width: 400, height: 400)
                     .offset(x: -350, y: 130)
                     .rotationEffect(.degrees(15))
-            }
-            else if category.tag == "Political"{
+            } else if category.tag == "Political" {
                 Image(systemName: category.icon)
                     .resizable()
                     .foregroundStyle(category.gradient)
@@ -33,8 +31,7 @@ struct CategoryCardView: View {
                     .frame(width: 160, height: 160)
                     .offset(x: -460, y: 100)
                     .rotationEffect(.degrees(10))
-            }
-            else { //Social Advocacy
+            } else { // Social Advocacy
                 Image(systemName: category.icon)
                     .resizable()
                     .foregroundStyle(category.gradient)
@@ -43,27 +40,27 @@ struct CategoryCardView: View {
                     .offset(x: -440, y: 43)
                     .rotationEffect(.degrees(5))
             }
-            
+
             VStack(alignment: .leading, spacing: 8) {
                 Spacer()
-                
-                //title
+
+                // title
                 if category.tag == "Product" {
                     Text(category.title)
                         .font(.system(size: 33, weight: .medium))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundColor(.black)
-                    
+
                     Text(category.subtitle)
                         .font(.system(size: 25))
                         .foregroundColor(.gray)
-                    
+
                 } else {
                     Text(category.title)
                         .font(.system(size: 25, weight: .medium))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundColor(.black)
-                    
+
                     Text(category.subtitle)
                         .font(.system(size: 20))
                         .foregroundColor(.gray)
@@ -89,7 +86,7 @@ struct CategoryCardView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(category.backgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: 20))
-        //.padding()
+        // .padding()
     }
 }
 
@@ -102,5 +99,5 @@ struct CategoryCardView: View {
 //        icon: "flame"
 //    ))
 //    .padding()
-    //.previewLayout(.sizeThatFits)
+    // .previewLayout(.sizeThatFits)
 }

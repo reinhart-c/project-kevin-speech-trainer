@@ -15,7 +15,7 @@ struct ProgressItem: View {
     let categoryIcon: String
     let score: Int
     let tag: String
-    
+
     var categoryDetails: (color: Color, icon: String) {
         switch categoryName {
         case "Product":
@@ -28,7 +28,7 @@ struct ProgressItem: View {
             return (.gray, "questionmark.circle")
         }
     }
-    
+
     var body: some View {
         HStack(spacing: 12) {
             // Title & Date
@@ -37,17 +37,17 @@ struct ProgressItem: View {
                     .fontWeight(.semibold)
                     .foregroundColor(.black)
                     .font(.system(size: 18))
-                
+
                 Spacer()
-                
+
                 Text(date)
                     .foregroundColor(.gray)
                     .font(.system(size: 16))
-                    
+
             }
             Spacer()
                 .frame(width: 100)
-            
+
             // Category Badge (temp, use if else)
             HStack(spacing: 4) {
                 Image(systemName: categoryDetails.icon)
@@ -57,7 +57,7 @@ struct ProgressItem: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .font(.system(size: 16))
-            
+
             Spacer()
                 .frame(width: 150)
 
@@ -68,10 +68,10 @@ struct ProgressItem: View {
                 .padding(11)
                 .background(Color.black)
                 .clipShape(Circle())
-            
+
             Spacer()
                 .frame(width: 100)
-            
+
             Image(systemName: "chevron.right")
                 .foregroundStyle(Color.darkGray)
                 .font(.system(size: 30))
@@ -79,7 +79,7 @@ struct ProgressItem: View {
         .padding()
         .background(Color.lightGrey)
         .clipShape(RoundedRectangle(cornerRadius: 25))
-        .frame(height:75)
+        .frame(height: 75)
         .padding(.horizontal)
         .padding([.leading, .trailing], 40)
     }
