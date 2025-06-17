@@ -10,7 +10,7 @@ import SwiftUI
 struct CategoryModalView: View {
     var category: Category
     var onReady: () -> Void
-    
+
     @State private var title: String = ""
     @Environment(\.dismiss) private var dismiss
 
@@ -38,7 +38,6 @@ struct CategoryModalView: View {
                 )
                 .frame(width: 500)
                 .foregroundStyle(Color.black)
-            
 
             HStack {
                 Button("Cancel") {
@@ -52,9 +51,9 @@ struct CategoryModalView: View {
                 .font(.system(size: 18))
                 .buttonStyle(PlainButtonStyle())
                 .frame(width: 180)
-                
+
                 Spacer()
-                
+
                 Button("I’m Ready") {
                     // Save to history here
                     // Then navigate
@@ -79,7 +78,7 @@ struct CategoryModalView: View {
     }
 }
 
-//#Preview {
+// #Preview {
 //    CategoryModalView(
 //        category: Category(
 //            title: "Product deserves the spotlight",
@@ -90,4 +89,4 @@ struct CategoryModalView: View {
 //        ),
 //        onReady: {}
 //    )
-//}
+// }

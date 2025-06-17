@@ -20,14 +20,14 @@ struct SpeechView: View {
     @State private var showingResult = false
     @State private var videoPlayer: AVPlayer?
     @State private var isVideoPlaying = false
-    
+
     var body: some View {
         VStack(spacing: 20) {
             Text("Speech Training")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.top)
-            
+
             HStack(spacing: 20) {
                 ZStack {
                     if showingVideoPlayer, let videoURL = speechViewModel.lastRecordedVideoURL {
@@ -50,7 +50,7 @@ struct SpeechView: View {
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 2)
                             )
                     }
-                    
+
                     if !speechViewModel.hasCameraPermissions {
                         VStack {
                             Image(systemName: "camera.fill")
@@ -90,7 +90,7 @@ struct SpeechView: View {
                 }
             }
             .padding(.horizontal)
-            
+
             Text(speechViewModel.isRecording ? "Recording in progress..." :
                  showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil ?
                  (isVideoPlaying ? "Playing recorded video" : "Video paused") : "Ready to record")
@@ -98,7 +98,7 @@ struct SpeechView: View {
                 .foregroundColor(speechViewModel.isRecording ? .red :
                                (showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil) ?
                                (isVideoPlaying ? .blue : .orange) : .primary)
-            
+
             // Simplified control buttons based on state
             HStack(spacing: 30) {
                 if showingVideoPlayer {
@@ -126,7 +126,7 @@ struct SpeechView: View {
                                 .fontWeight(.semibold)
                         }
                     }
-                    
+
                     // Try Again button for video playback state
                     Button(action: {
                         // Reset to camera view
@@ -210,16 +210,16 @@ struct SpeechView: View {
                 }
             }
             .padding()
-            
+
             // Previous recordings section (simplified)
             if !speechViewModel.recordedVideos.isEmpty && !speechViewModel.isRecording {
                 VStack(alignment: .leading) {
                     HStack {
                         Text("Previous Recordings")
                             .font(.headline)
-                        
+
                         Spacer()
-                        
+
                         Button("Delete All") {
                             speechViewModel.deleteAllRecordings()
                             showingVideoPlayer = false
@@ -232,7 +232,7 @@ struct SpeechView: View {
                         .foregroundColor(.red)
                     }
                     .padding(.horizontal)
-                    
+
                     ScrollView {
                         LazyVStack {
                             ForEach(speechViewModel.recordedVideos, id: \.self) { url in
@@ -246,9 +246,9 @@ struct SpeechView: View {
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
-                                    
+
                                     Spacer()
-                                    
+
                                     HStack(spacing: 10) {
                                         Button("View") {
                                             speechViewModel.lastRecordedVideoURL = url
@@ -259,7 +259,7 @@ struct SpeechView: View {
                                         }
                                         .buttonStyle(.borderedProminent)
                                         .controlSize(.small)
-                                        
+
                                         Button("Analyze") {
                                             selectedVideoForTranscription = url
                                             showingTranscriptionView = true
@@ -268,7 +268,7 @@ struct SpeechView: View {
                                         .controlSize(.small)
                                         .foregroundColor(.blue)
                                         .disabled(speechViewModel.isTranscribing)
-                                        
+
                                         Button("Delete") {
                                             speechViewModel.deleteRecording(url: url)
                                             if speechViewModel.lastRecordedVideoURL == url {
@@ -294,7 +294,7 @@ struct SpeechView: View {
                     .frame(maxHeight: 200)
                 }
             }
-            
+
             Spacer()
         }
         .onAppear {
@@ -306,7 +306,7 @@ struct SpeechView: View {
             prompterViewModel.stopHighlighting()
             videoPlayer?.pause()
         }
-        .onChange(of: speechViewModel.lastRecordedVideoURL) { oldValue, newValue in
+        .onChange(of: speechViewModel.lastRecordedVideoURL) { _, newValue in
             if newValue != nil && !speechViewModel.isRecording {
                 showingVideoPlayer = true
                 if let url = newValue {
@@ -330,7 +330,7 @@ struct SpeechView: View {
             print("🔄 isTranscribing changed from \(oldValue) to \(newValue)")
             print("📊 current transcriptionText: '\(speechViewModel.transcriptionText)'")
             print("🎬 current isRecording: \(speechViewModel.isRecording)")
-            
+
             // When transcription stops AND recording has stopped AND emotion analysis is complete
             if !newValue && !speechViewModel.isRecording && !speechViewModel.isAnalyzingEmotion {
                 print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
@@ -342,7 +342,7 @@ struct SpeechView: View {
                 showingResult = true
             }
         }
-        .onChange(of: speechViewModel.isAnalyzingEmotion) { oldValue, newValue in
+        .onChange(of: speechViewModel.isAnalyzingEmotion) { _, newValue in
             // When emotion analysis stops AND transcription has stopped AND recording has stopped
             if !newValue && !speechViewModel.isTranscribing && !speechViewModel.isRecording {
                 print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
@@ -363,7 +363,7 @@ struct SpeechView: View {
             .presentationDetents([.large])
         }
     }
-    
+
     private func formatDate(from url: URL) -> String {
         let filename = url.lastPathComponent
         if let timeInterval = Double(filename.replacingOccurrences(of: "recording_", with: "").replacingOccurrences(of: ".mov", with: "")) {
@@ -382,7 +382,7 @@ struct TranscriptionView: View {
     let videoURL: URL?
     @ObservedObject var viewModel: SpeechViewModel
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -393,15 +393,15 @@ struct TranscriptionView: View {
                     .disabled(viewModel.isTranscribing)
                     .buttonStyle(.bordered)
                 }
-                
+
                 Spacer()
-                
+
                 Text("Speech Transcription")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                
+
                 Spacer()
-                
+
                 Button("Done") {
                     dismiss()
                 }
@@ -410,9 +410,9 @@ struct TranscriptionView: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
             .background(Color(NSColor.controlBackgroundColor))
-            
+
             Divider()
-         
+
             VStack(spacing: 20) {
                 if let url = videoURL {
                     Text("Recording: \(url.lastPathComponent)")
@@ -420,7 +420,7 @@ struct TranscriptionView: View {
                         .foregroundColor(.secondary)
                         .padding(.top, 16)
                 }
-                
+
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         if viewModel.isTranscribing {
@@ -436,13 +436,13 @@ struct TranscriptionView: View {
                             .background(Color.blue.opacity(0.1))
                             .cornerRadius(10)
                         }
-                        
+
                         if !viewModel.transcriptionText.isEmpty {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Transcription:")
                                     .font(.headline)
                                     .fontWeight(.semibold)
-                                
+
                                 ScrollView {
                                     Text(viewModel.transcriptionText)
                                         .font(.body)
@@ -457,14 +457,14 @@ struct TranscriptionView: View {
                                 .cornerRadius(10)
                             }
                         }
-                        
+
                         if let error = viewModel.transcriptionError {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text("Error:")
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.red)
-                                
+
                                 Text(error)
                                     .font(.body)
                                     .padding(16)
@@ -473,17 +473,17 @@ struct TranscriptionView: View {
                                     .cornerRadius(10)
                             }
                         }
-                        
+
                         if !viewModel.isTranscribing && viewModel.transcriptionText.isEmpty && viewModel.transcriptionError == nil {
                              VStack(spacing: 16) {
                                 Image(systemName: "waveform.and.mic")
                                     .font(.system(size: 48))
                                     .foregroundColor(.secondary)
-                                
+
                                 Text("Ready to transcribe")
                                     .font(.title2)
                                     .fontWeight(.medium)
-                                
+
                                 if videoURL != nil {
                                      Text("Tap 'Retry Transcription' to convert the audio from your recording to text, or it will start automatically if triggered from the main view.")
                                         .font(.body)
@@ -521,23 +521,23 @@ struct TranscriptionView: View {
 
 struct CameraPreview: NSViewRepresentable {
     let session: AVCaptureSession
-    
+
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         view.wantsLayer = true
-        
+
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
         previewLayer.videoGravity = .resizeAspectFill
         previewLayer.frame = view.bounds
         view.layer = previewLayer
-        
+
         return view
     }
-    
+
     func updateNSView(_ nsView: NSView, context: Context) {
         if let layer = nsView.layer as? AVCaptureVideoPreviewLayer {
             layer.session = session
-            
+
             DispatchQueue.main.async {
                  if layer.frame != nsView.bounds {
                     layer.frame = nsView.bounds

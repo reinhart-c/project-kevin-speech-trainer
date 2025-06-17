@@ -5,7 +5,6 @@
 //  Created by Alifa Reppawali on 14/06/25.
 //
 
-
 import SwiftUI
 import Lottie
 

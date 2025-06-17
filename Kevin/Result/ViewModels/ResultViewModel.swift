@@ -12,10 +12,10 @@ import SwiftUI
 class ResultViewModel: ObservableObject {
     @Published var result: Result?
     @Published var isCalculating: Bool = false
-    
+
     func calculateScore(transcribedText: String, expectedText: String, emotionResults: [VoiceEmotionClassifierOutput]? = nil) {
         isCalculating = true
-        
+
         // Simulate some processing time for better UX
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let result = Result(
@@ -23,22 +23,22 @@ class ResultViewModel: ObservableObject {
                 expectedText: expectedText,
                 emotionResults: emotionResults
             )
-            
+
             DispatchQueue.main.async {
                 self?.result = result
                 self?.isCalculating = false
             }
         }
     }
-    
+
     func reset() {
         result = nil
         isCalculating = false
     }
-    
+
     var scoreColor: Color {
         guard let score = result?.score else { return .gray }
-        
+
         switch score {
         case 90...100: return .green
         case 70...89: return .blue
@@ -46,10 +46,10 @@ class ResultViewModel: ObservableObject {
         default: return .red
         }
     }
-    
+
     var scoreGrade: String {
         guard let score = result?.score else { return "N/A" }
-        
+
         switch score {
         case 90...100: return "Excellent"
         case 80...89: return "Good"

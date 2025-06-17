@@ -157,19 +157,19 @@ struct EmotionRadarView: View {
                 }
 
                 // Main Spokes with gradient
-                ForEach(0..<dimensions.count, id: \.self) { i in
+                ForEach(0..<dimensions.count, id: \.self) { idx in
                     Path { path in
-                        let angle = radAngle_fromFraction(numerator: i, denominator: dimensions.count)
-                        let x = (width - (50 + labelWidth))/2 * cos(angle)
-                        let y = (width - (50 + labelWidth))/2 * sin(angle)
+                        let angle = radAngle_fromFraction(numerator: idx, denominator: dimensions.count)
+                        let xCoor = (width - (50 + labelWidth))/2 * cos(angle)
+                        let yCoor = (width - (50 + labelWidth))/2 * sin(angle)
                         path.move(to: center)
-                        path.addLine(to: CGPoint(x: center.x + x, y: center.y + y))
+                        path.addLine(to: CGPoint(x: center.x + xCoor, y: center.y + yCoor))
                     }
                     .stroke(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                emotionColor(for: dimensions[i].emotionCase.rawValue).opacity(0.6),
-                                emotionColor(for: dimensions[i].emotionCase.rawValue).opacity(0.1)
+                                emotionColor(for: dimensions[idx].emotionCase.rawValue).opacity(0.6),
+                                emotionColor(for: dimensions[idx].emotionCase.rawValue).opacity(0.1)
                             ]),
                             startPoint: .center,
                             endPoint: .bottomTrailing
@@ -179,32 +179,32 @@ struct EmotionRadarView: View {
                 }
 
                 // Labels
-                ForEach(0..<dimensions.count, id: \.self) { i in
-                    Text(dimensions[i].emotionCase.rawValue)
+                ForEach(0..<dimensions.count, id: \.self) { idx in
+                    Text(dimensions[idx].emotionCase.rawValue)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(emotionColor(for: dimensions[i].emotionCase.rawValue))
+                        .foregroundColor(emotionColor(for: dimensions[idx].emotionCase.rawValue))
                         .frame(width: labelWidth, height: 12)
                         .rotationEffect(.degrees(
-                            (degAngle_fromFraction(numerator: i, denominator: dimensions.count) > 90 &&
-                             degAngle_fromFraction(numerator: i, denominator: dimensions.count) < 270) ? 180 : 0
+                            (degAngle_fromFraction(numerator: idx, denominator: dimensions.count) > 90 &&
+                             degAngle_fromFraction(numerator: idx, denominator: dimensions.count) < 270) ? 180 : 0
                         ))
                         .background(Color.clear)
                         .offset(x: (width - 40)/2)
                         .rotationEffect(.radians(
-                            Double(radAngle_fromFraction(numerator: i, denominator: dimensions.count))
+                            Double(radAngle_fromFraction(numerator: idx, denominator: dimensions.count))
                         ))
                 }
 
                 // Outer Border with gradient
                 Path { path in
-                    for i in 0..<dimensions.count + 1 {
-                        let angle = radAngle_fromFraction(numerator: i, denominator: dimensions.count)
-                        let x = (width - (50 + labelWidth))/2 * cos(angle)
-                        let y = (width - (50 + labelWidth))/2 * sin(angle)
-                        if i == 0 {
-                            path.move(to: CGPoint(x: center.x + x, y: center.y + y))
+                    for idx in 0..<dimensions.count + 1 {
+                        let angle = radAngle_fromFraction(numerator: idx, denominator: dimensions.count)
+                        let xCoor = (width - (50 + labelWidth))/2 * cos(angle)
+                        let yCoor = (width - (50 + labelWidth))/2 * sin(angle)
+                        if idx == 0 {
+                            path.move(to: CGPoint(x: center.x + xCoor, y: center.y + yCoor))
                         } else {
-                            path.addLine(to: CGPoint(x: center.x + x, y: center.y + y))
+                            path.addLine(to: CGPoint(x: center.x + xCoor, y: center.y + yCoor))
                         }
                     }
                 }
@@ -221,8 +221,8 @@ struct EmotionRadarView: View {
                 )
 
                 // Enhanced Data Polygons with multiple gradient layers
-                ForEach(0..<data.count, id: \.self) { j in
-                    let path = createDataPath(for: j)
+                ForEach(0..<data.count, id: \.self) { jidx in
+                    let path = createDataPath(for: jidx)
 
                     ZStack {
                         // Outer glow effect
@@ -230,8 +230,8 @@ struct EmotionRadarView: View {
                             .fill(
                                 RadialGradient(
                                     gradient: Gradient(colors: [
-                                        data[j].color.opacity(0.4),
-                                        data[j].color.opacity(0.1),
+                                        data[jidx].color.opacity(0.4),
+                                        data[jidx].color.opacity(0.1),
                                         Color.clear
                                     ]),
                                     center: .center,
@@ -246,9 +246,9 @@ struct EmotionRadarView: View {
                             .fill(
                                 LinearGradient(
                                     gradient: Gradient(stops: [
-                                        .init(color: data[j].color.opacity(0.6), location: 0.0),
-                                        .init(color: data[j].color.opacity(0.3), location: 0.5),
-                                        .init(color: data[j].color.opacity(0.1), location: 1.0)
+                                        .init(color: data[jidx].color.opacity(0.6), location: 0.0),
+                                        .init(color: data[jidx].color.opacity(0.3), location: 0.5),
+                                        .init(color: data[jidx].color.opacity(0.1), location: 1.0)
                                     ]),
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -260,8 +260,8 @@ struct EmotionRadarView: View {
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        data[j].color.opacity(0.9),
-                                        data[j].color.opacity(0.6)
+                                        data[jidx].color.opacity(0.9),
+                                        data[jidx].color.opacity(0.6)
                                     ]),
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -272,14 +272,14 @@ struct EmotionRadarView: View {
                 }
 
                 // Enhanced Data Points with glow effect
-                ForEach(0..<data.count, id: \.self) { j in
-                    ForEach(0..<dimensions.count, id: \.self) { i in
-                        let thisDimension = dimensions[i]
-                        let dataPointVal = getDataPointValue(for: thisDimension.emotionCase, in: data[j])
-                        let angle = radAngle_fromFraction(numerator: i, denominator: dimensions.count)
+                ForEach(0..<data.count, id: \.self) { jidx in
+                    ForEach(0..<dimensions.count, id: \.self) { idx in
+                        let thisDimension = dimensions[idx]
+                        let dataPointVal = getDataPointValue(for: thisDimension.emotionCase, in: data[jidx])
+                        let angle = radAngle_fromFraction(numerator: idx, denominator: dimensions.count)
                         let size = ((width - (50 + labelWidth))/2) * (CGFloat(dataPointVal)/CGFloat(thisDimension.maxVal))
-                        let x = size * cos(angle)
-                        let y = size * sin(angle)
+                        let xCoor = size * cos(angle)
+                        let yCoor = size * sin(angle)
 
                         ZStack {
                             // Glow effect
@@ -318,7 +318,7 @@ struct EmotionRadarView: View {
                                         .frame(width: 6, height: 6)
                                 )
                         }
-                        .position(x: center.x + x, y: center.y + y)
+                        .position(x: center.x + xCoor, y: center.y + yCoor)
                     }
                 }
             }
@@ -342,19 +342,19 @@ struct EmotionRadarView: View {
 
     private func createDataPath(for dataIndex: Int) -> Path {
         Path { path in
-            for i in 0..<dimensions.count + 1 {
-                let thisDimension = dimensions[i == dimensions.count ? 0 : i]
+            for idx in 0..<dimensions.count + 1 {
+                let thisDimension = dimensions[idx == dimensions.count ? 0 : idx]
                 let maxVal = thisDimension.maxVal
                 let dataPointVal = getDataPointValue(for: thisDimension.emotionCase, in: data[dataIndex])
-                let angle = radAngle_fromFraction(numerator: i == dimensions.count ? 0 : i, denominator: dimensions.count)
+                let angle = radAngle_fromFraction(numerator: idx == dimensions.count ? 0 : idx, denominator: dimensions.count)
                 let size = ((width - (50 + labelWidth))/2) * (CGFloat(dataPointVal)/CGFloat(maxVal))
-                let x = size * cos(angle)
-                let y = size * sin(angle)
+                let xCoor = size * cos(angle)
+                let yCoor = size * sin(angle)
 
-                if i == 0 {
-                    path.move(to: CGPoint(x: center.x + x, y: center.y + y))
+                if idx == 0 {
+                    path.move(to: CGPoint(x: center.x + xCoor, y: center.y + yCoor))
                 } else {
-                    path.addLine(to: CGPoint(x: center.x + x, y: center.y + y))
+                    path.addLine(to: CGPoint(x: center.x + xCoor, y: center.y + yCoor))
                 }
             }
         }

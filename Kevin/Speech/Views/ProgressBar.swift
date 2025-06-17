@@ -9,14 +9,14 @@ import SwiftUI
 
 struct ProgressBar: View {
     var body: some View {
-        let progress: Double = 0.5 //temp
-        let remainingTime: String = "10:00" //temp
-        
+        let progress: Double = 0.5 // temp
+        let remainingTime: String = "10:00" // temp
+
         HStack {
-            ZStack{
+            ZStack {
                 Circle()
                     .fill(Color.white)
-                    .frame(width:35, height:35)
+                    .frame(width: 35, height: 35)
                 Text("🏆")
                     .font(.system(size: 22))
             }
@@ -25,8 +25,8 @@ struct ProgressBar: View {
                 .font(.system(size: 15))
             Spacer()
                 .frame(width: 40)
-            
-            HStack{
+
+            HStack {
                 ZStack(alignment: .leading) {
                     Capsule()
                         .fill(Color.pinkBarEmpty)
@@ -43,8 +43,8 @@ struct ProgressBar: View {
                         .frame(width: 120 * progress, height: 6)
                         .animation(.easeInOut(duration: 0.3), value: progress)
                     }
-                
-                //temporary
+
+                // temporary
                 Text(remainingTime)
                     .fontWeight(.semibold)
                     .font(.system(size: 15))
@@ -55,7 +55,7 @@ struct ProgressBar: View {
         .padding(.vertical, 10)
         .background(
             LinearGradient(
-                gradient: Gradient(colors:  [Color.yellowBar.opacity(0.2), Color.pinkBar.opacity(0.1)]), startPoint: .leading, endPoint: .trailing
+                gradient: Gradient(colors: [Color.yellowBar.opacity(0.2), Color.pinkBar.opacity(0.1)]), startPoint: .leading, endPoint: .trailing
             )
         )
         .clipShape(Capsule())

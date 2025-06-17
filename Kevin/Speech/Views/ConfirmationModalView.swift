@@ -5,7 +5,6 @@
 //  Created by Alifa Reppawali on 16/06/25.
 //
 
-
 import SwiftUI
 
 struct ConfirmationModalView: View {
@@ -87,4 +86,3 @@ extension ConfirmationModalView.ActionType: Identifiable {
         dontAskAgain: .constant(false)
     )
 }
-
