@@ -34,65 +34,47 @@ struct MainView: View {
                         confirmationAction = .retry
                         showConfirmationModal = true
                     }
-                    .buttonStyle(PlainButtonStyle())
-                    .padding()
-                    
-                    //end
-                    Button{
-                        //endSession
-                        if dontAskAgain {
-                            speechViewModel.stopRecording()
-                            speechViewModel.stopSession()
-                        } else {
-                            confirmationAction = .endSession
-                            showConfirmationModal = true
-                        }
-                        
-                    } label:{
-                        Text("End Session")
-                            .foregroundStyle(.white)
-                            .font(.system(size: 20))
-                    }
-                    .padding()
-                    .background(Color.redButton)
-                    .cornerRadius(30)
-                    .buttonStyle(PlainButtonStyle())
-                    
-                    ProgressBar()
-                        .padding(.trailing, 40)
+                } label: {
+                    Text("Retry")
+                        .foregroundStyle(.white)
+                        .font(.system(size: 20))
                 }
-                .padding(.top, 20)
+                .padding()
+                .background(Color.blue)
+                .cornerRadius(30)
+                .buttonStyle(PlainButtonStyle())
+                .padding(.trailing, 10)
                 
-                HStack {
-                    SpeechView()
-
+                //end
+                Button {
+                    //endSession
+                    if dontAskAgain {
+                        speechViewModel.stopRecording()
+                        speechViewModel.stopSession()
+                    } else {
+                        confirmationAction = .endSession
+                        showConfirmationModal = true
+                    }
+                } label: {
+                    Text("End Session")
+                        .foregroundStyle(.white)
+                        .font(.system(size: 20))
                 }
+                .padding()
+                .background(Color.red)
+                .cornerRadius(30)
+                .buttonStyle(PlainButtonStyle())
+                
+                ProgressBar()
+                    .padding(.trailing, 40)
             }
-            .padding()
+            .padding(.top, 20)
             
-            .sheet(item: $confirmationAction) { action in
-                ConfirmationModalView(
-                    actionType: action,
-                    onConfirm: {
-                        if action == .endSession {
-                            speechViewModel.stopRecording()
-                            speechViewModel.stopSession()
-                        } else if action == .retry {
-                            speechViewModel.stopRecording()
-                            speechViewModel.stopSession()
-                            speechViewModel.startRecording()
-                        }
-                        confirmationAction = nil
-                    },
-                    onCancel: {
-                        confirmationAction = nil
-                    },
-                    dontAskAgain: $dontAskAgain
-                )
+            HStack {
+                SpeechView()
             }
         }
         .padding()
-
         .sheet(item: $confirmationAction) { action in
             ConfirmationModalView(
                 actionType: action,

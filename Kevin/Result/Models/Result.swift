@@ -39,7 +39,7 @@ struct Result {
         // Calculate score
         self.score = Self.calculateScore(
             expectedWords: expectedWords,
-            transcribedWords: transcribedWords,
+            transcribedWords: transcribedWords
         )
 
         // Process emotion results
@@ -64,7 +64,7 @@ struct Result {
 
     private static func calculateScore(
         expectedWords: [String],
-        transcribedWords: [String],
+        transcribedWords: [String]
         /* drop matchedWords/extraWords here—they’ll be recomputed */
     ) -> Int {
         guard !expectedWords.isEmpty, !transcribedWords.isEmpty else { return 0 }

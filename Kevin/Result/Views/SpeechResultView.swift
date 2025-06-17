@@ -64,5 +64,5 @@ struct SpeechResultView: View {
 }
 
 #Preview {
-    SpeechResultView()
+    SpeechResultView(path: <#Binding<NavigationPath>#>)
 }
