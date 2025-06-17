@@ -15,82 +15,87 @@ struct MainView: View {
     @State private var dontAskAgain = false
     
     var body: some View {
-        VStack {
-            HStack {
-                Text("Product deserves the spotlight") //category.title
-                    .font(.system(size: 30, weight: .semibold))
-                    .padding(.leading, 40)
-                
-                Spacer()
-                
-                //retry
-                Button{
-                    //retry session
-                    if dontAskAgain {
-                        speechViewModel.stopRecording()
-                        speechViewModel.stopSession()
-                        speechViewModel.startRecording()
-                    } else {
-                        confirmationAction = .retry
-                        showConfirmationModal = true
-                    }
-
-                } label:{
-                    Image(systemName: "arrow.trianglehead.clockwise")
-                        .font(.system(size: 30))
-                }
-                .buttonStyle(PlainButtonStyle())
-                
-                //end
-                Button{
-                    //endSession
-                    if dontAskAgain {
-                        speechViewModel.stopRecording()
-                        speechViewModel.stopSession()
-                    } else {
-                        confirmationAction = .endSession
-                        showConfirmationModal = true
-                    }
+        ScrollView {
+            VStack {
+                HStack {
+                    Text("Product deserves the spotlight") //category.title
+                        .font(.system(size: 30, weight: .semibold))
+                        .padding(.leading, 40)
                     
-                } label:{
-                    Text("End Session")
-                        .foregroundStyle(.white)
-                        .font(.system(size: 20))
-                }
-                .padding()
-                .background(Color.redButton)
-                .cornerRadius(30)
-                .buttonStyle(PlainButtonStyle())
-
-                ProgressBar()
-                    .padding(.trailing, 40)
-            }
-            
-            HStack {
-                SpeechView()
-            }
-        }
-        .padding()
-        
-        .sheet(item: $confirmationAction) { action in
-            ConfirmationModalView(
-                actionType: action,
-                onConfirm: {
-                    if action == .endSession {
-                        speechViewModel.stopRecording()
-                        speechViewModel.stopSession()
-                    } else if action == .retry {
-                        speechViewModel.stopRecording()
-                        speechViewModel.stopSession()
-                        speechViewModel.startRecording()
+                    Spacer()
+                    
+                    //retry
+                    Button{
+                        //retry session
+                        if dontAskAgain {
+                            speechViewModel.stopRecording()
+                            speechViewModel.stopSession()
+                            speechViewModel.startRecording()
+                        } else {
+                            confirmationAction = .retry
+                            showConfirmationModal = true
+                        }
+                        
+                    } label:{
+                        Image(systemName: "arrow.trianglehead.clockwise")
+                            .font(.system(size: 30))
+                            .foregroundStyle(Color.gray)
                     }
-                    confirmationAction = nil
-                },
-                onCancel: {
-                    confirmationAction = nil
-                },
-                dontAskAgain: $dontAskAgain
-            )
+                    .buttonStyle(PlainButtonStyle())
+                    .padding()
+                    
+                    //end
+                    Button{
+                        //endSession
+                        if dontAskAgain {
+                            speechViewModel.stopRecording()
+                            speechViewModel.stopSession()
+                        } else {
+                            confirmationAction = .endSession
+                            showConfirmationModal = true
+                        }
+                        
+                    } label:{
+                        Text("End Session")
+                            .foregroundStyle(.white)
+                            .font(.system(size: 20))
+                    }
+                    .padding()
+                    .background(Color.redButton)
+                    .cornerRadius(30)
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    ProgressBar()
+                        .padding(.trailing, 40)
+                }
+                .padding(.top, 20)
+                
+                HStack {
+                    SpeechView()
+                }
+            }
+            .padding()
+            
+            .sheet(item: $confirmationAction) { action in
+                ConfirmationModalView(
+                    actionType: action,
+                    onConfirm: {
+                        if action == .endSession {
+                            speechViewModel.stopRecording()
+                            speechViewModel.stopSession()
+                        } else if action == .retry {
+                            speechViewModel.stopRecording()
+                            speechViewModel.stopSession()
+                            speechViewModel.startRecording()
+                        }
+                        confirmationAction = nil
+                    },
+                    onCancel: {
+                        confirmationAction = nil
+                    },
+                    dontAskAgain: $dontAskAgain
+                )
+            }
         }
 
     }
