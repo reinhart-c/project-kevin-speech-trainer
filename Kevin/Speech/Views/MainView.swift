@@ -15,6 +15,26 @@ struct MainView: View {
     @State private var dontAskAgain = false
     
     var body: some View {
+<<<<<<< SpeechRevision
+        VStack {
+            HStack {
+                Text("Product deserves the spotlight") //category.title
+                    .font(.system(size: 30, weight: .semibold))
+                    .padding(.leading, 40)
+                
+                Spacer()
+                
+                //retry
+                Button{
+                    //retry session
+                    if dontAskAgain {
+                        speechViewModel.stopRecording()
+                        speechViewModel.stopSession()
+                        speechViewModel.startRecording{}
+                    } else {
+                        confirmationAction = .retry
+                        showConfirmationModal = true
+=======
         ScrollView {
             VStack {
                 HStack {
@@ -40,6 +60,7 @@ struct MainView: View {
                         Image(systemName: "arrow.trianglehead.clockwise")
                             .font(.system(size: 30))
                             .foregroundStyle(Color.gray)
+>>>>>>> mainView
                     }
                     .buttonStyle(PlainButtonStyle())
                     .padding()
@@ -97,6 +118,31 @@ struct MainView: View {
                 )
             }
         }
+<<<<<<< SpeechRevision
+        .padding()
+        
+        .sheet(item: $confirmationAction) { action in
+            ConfirmationModalView(
+                actionType: action,
+                onConfirm: {
+                    if action == .endSession {
+                        speechViewModel.stopRecording()
+                        speechViewModel.stopSession()
+                    } else if action == .retry {
+                        speechViewModel.stopRecording()
+                        speechViewModel.stopSession()
+                        speechViewModel.startRecording{}
+                    }
+                    confirmationAction = nil
+                },
+                onCancel: {
+                    confirmationAction = nil
+                },
+                dontAskAgain: $dontAskAgain
+            )
+        }
+=======
+>>>>>>> mainView
 
     }
 }
