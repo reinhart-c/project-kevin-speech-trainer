@@ -36,7 +36,7 @@ struct SpeechView: View {
                             .aspectRatio(16/9, contentMode: .fit)
                             .cornerRadius(15)
                             .onAppear {
-                                if videoPlayer == nil {
+                                if videoPlayer == nil { // Ensure player is initialized only once
                                     videoPlayer = AVPlayer(url: videoURL)
                                 }
                             }
@@ -47,7 +47,7 @@ struct SpeechView: View {
                             .cornerRadius(15)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 2)
+                                    .stroke(Color.gray.opacity(0.5), lineWidth: 1) // Optional border
                             )
                     }
 
@@ -66,8 +66,16 @@ struct SpeechView: View {
                                 .padding(.horizontal)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.black.opacity(0.1))
+                        .background(Color.black.opacity(0.1)) // Semi-transparent background
                         .cornerRadius(15)
+                    } else if speechViewModel.isCountingDown { // Display countdown
+                        Text("\(speechViewModel.countdownSeconds)")
+                            .font(.system(size: 100, weight: .bold))
+                            .foregroundColor(.white)
+                            .shadow(radius: 10)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.black.opacity(0.3))
+                            .cornerRadius(15)
                     }
                 }
 
@@ -90,12 +98,14 @@ struct SpeechView: View {
                 }
             }
             .padding(.horizontal)
-
-            Text(speechViewModel.isRecording ? "Recording in progress..." :
+            
+            Text(speechViewModel.isCountingDown ? "Get ready..." : // Display "Get ready..." during countdown
+                 speechViewModel.isRecording ? "Recording in progress..." :
                  showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil ?
                  (isVideoPlaying ? "Playing recorded video" : "Video paused") : "Ready to record")
                 .font(.headline)
-                .foregroundColor(speechViewModel.isRecording ? .red :
+                .foregroundColor(speechViewModel.isCountingDown ? .blue : // Color for countdown text
+                                 speechViewModel.isRecording ? .red :
                                (showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil) ?
                                (isVideoPlaying ? .blue : .orange) : .primary)
 
@@ -184,8 +194,9 @@ struct SpeechView: View {
                             showingResult = false
                             resultViewModel.reset()
                             prompterViewModel.resetHighlighting()
-                            prompterViewModel.startHighlighting()
-                            speechViewModel.startRecording()
+                            speechViewModel.startRecording {
+                                prompterViewModel.startHighlighting()
+                            }
                             showingVideoPlayer = false
                             speechViewModel.transcriptionText = ""
                             speechViewModel.transcriptionError = nil
@@ -210,8 +221,6 @@ struct SpeechView: View {
                 }
             }
             .padding()
-
-            // Previous recordings section (simplified)
             if !speechViewModel.recordedVideos.isEmpty && !speechViewModel.isRecording {
                 VStack(alignment: .leading) {
                     HStack {
@@ -306,12 +315,23 @@ struct SpeechView: View {
             prompterViewModel.stopHighlighting()
             videoPlayer?.pause()
         }
-        .onChange(of: speechViewModel.lastRecordedVideoURL) { _, newValue in
+        .onChange(of: speechViewModel.isRecording) { oldValue, newValue in
+            if !newValue && oldValue && speechViewModel.lastRecordedVideoURL != nil {
+                if let url = speechViewModel.lastRecordedVideoURL {
+                    videoPlayer = AVPlayer(url: url) 
+                    isVideoPlaying = false 
+                }
+                showingResult = true
+            }
+        }
+        .onChange(of: speechViewModel.lastRecordedVideoURL) { oldValue, newValue in
             if newValue != nil && !speechViewModel.isRecording {
-                showingVideoPlayer = true
-                if let url = newValue {
-                    videoPlayer = AVPlayer(url: url)
-                    isVideoPlaying = false
+                if !showingVideoPlayer { 
+                    showingVideoPlayer = true
+                    if let url = newValue {
+                        videoPlayer = AVPlayer(url: url)
+                        isVideoPlaying = false
+                    }
                 }
             } else if newValue == nil {
                 showingVideoPlayer = false
@@ -330,28 +350,29 @@ struct SpeechView: View {
             print("🔄 isTranscribing changed from \(oldValue) to \(newValue)")
             print("📊 current transcriptionText: '\(speechViewModel.transcriptionText)'")
             print("🎬 current isRecording: \(speechViewModel.isRecording)")
-
-            // When transcription stops AND recording has stopped AND emotion analysis is complete
             if !newValue && !speechViewModel.isRecording && !speechViewModel.isAnalyzingEmotion {
-                print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
+                print("🎯 Both transcription and emotion analysis finished. Calculating score.")
                 resultViewModel.calculateScore(
                     transcribedText: speechViewModel.transcriptionText,
                     expectedText: prompterViewModel.prompter.script,
                     emotionResults: speechViewModel.emotionResults
                 )
-                showingResult = true
+                if !showingResult && speechViewModel.lastRecordedVideoURL != nil { 
+                    showingResult = true
+                }
             }
         }
-        .onChange(of: speechViewModel.isAnalyzingEmotion) { _, newValue in
-            // When emotion analysis stops AND transcription has stopped AND recording has stopped
+        .onChange(of: speechViewModel.isAnalyzingEmotion) { oldValue, newValue in
             if !newValue && !speechViewModel.isTranscribing && !speechViewModel.isRecording {
-                print("🎯 Both transcription and emotion analysis finished. Calculating score and showing result.")
+                print("🎯 Both transcription and emotion analysis finished. Calculating score.")
                 resultViewModel.calculateScore(
                     transcribedText: speechViewModel.transcriptionText,
                     expectedText: prompterViewModel.prompter.script,
                     emotionResults: speechViewModel.emotionResults
                 )
-                showingResult = true
+                if !showingResult && speechViewModel.lastRecordedVideoURL != nil { 
+                    showingResult = true
+                }
             }
         }
         .sheet(isPresented: $showingTranscriptionView) {

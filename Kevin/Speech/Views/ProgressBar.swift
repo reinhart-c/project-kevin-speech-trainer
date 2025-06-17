@@ -24,9 +24,9 @@ struct ProgressBar: View {
                 .fontWeight(.semibold)
                 .font(.system(size: 15))
             Spacer()
-                .frame(width: 40)
-
-            HStack {
+                .frame(width: 15)
+            
+            HStack{
                 ZStack(alignment: .leading) {
                     Capsule()
                         .fill(Color.pinkBarEmpty)
@@ -40,7 +40,7 @@ struct ProgressBar: View {
                         endPoint: .trailing
                             )
                         )
-                        .frame(width: 120 * progress, height: 6)
+                        .frame(width: 100 * progress, height: 6)
                         .animation(.easeInOut(duration: 0.3), value: progress)
                     }
 

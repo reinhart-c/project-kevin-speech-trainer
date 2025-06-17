@@ -29,45 +29,66 @@ struct MainView: View {
                     if dontAskAgain {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
-                        speechViewModel.startRecording()
+                        speechViewModel.startRecording{}
                     } else {
                         confirmationAction = .retry
                         showConfirmationModal = true
                     }
-
-                } label: {
-                    Image(systemName: "arrow.trianglehead.clockwise")
-                        .font(.system(size: 30))
-                }
-                .buttonStyle(PlainButtonStyle())
-
-                // end
-                Button {
-                    // endSession
-                    if dontAskAgain {
-                        speechViewModel.stopRecording()
-                        speechViewModel.stopSession()
-                    } else {
-                        confirmationAction = .endSession
-                        showConfirmationModal = true
+                    .buttonStyle(PlainButtonStyle())
+                    .padding()
+                    
+                    //end
+                    Button{
+                        //endSession
+                        if dontAskAgain {
+                            speechViewModel.stopRecording()
+                            speechViewModel.stopSession()
+                        } else {
+                            confirmationAction = .endSession
+                            showConfirmationModal = true
+                        }
+                        
+                    } label:{
+                        Text("End Session")
+                            .foregroundStyle(.white)
+                            .font(.system(size: 20))
                     }
-
-                } label: {
-                    Text("End Session")
-                        .foregroundStyle(.white)
-                        .font(.system(size: 20))
+                    .padding()
+                    .background(Color.redButton)
+                    .cornerRadius(30)
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    ProgressBar()
+                        .padding(.trailing, 40)
                 }
-                .padding()
-                .background(Color.redButton)
-                .cornerRadius(30)
-                .buttonStyle(PlainButtonStyle())
+                .padding(.top, 20)
+                
+                HStack {
+                    SpeechView()
 
-                ProgressBar()
-                    .padding(.trailing, 40)
+                }
             }
-
-            HStack {
-                SpeechView()
+            .padding()
+            
+            .sheet(item: $confirmationAction) { action in
+                ConfirmationModalView(
+                    actionType: action,
+                    onConfirm: {
+                        if action == .endSession {
+                            speechViewModel.stopRecording()
+                            speechViewModel.stopSession()
+                        } else if action == .retry {
+                            speechViewModel.stopRecording()
+                            speechViewModel.stopSession()
+                            speechViewModel.startRecording()
+                        }
+                        confirmationAction = nil
+                    },
+                    onCancel: {
+                        confirmationAction = nil
+                    },
+                    dontAskAgain: $dontAskAgain
+                )
             }
         }
         .padding()
@@ -82,7 +103,7 @@ struct MainView: View {
                     } else if action == .retry {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
-                        speechViewModel.startRecording()
+                        speechViewModel.startRecording{}
                     }
                     confirmationAction = nil
                 },
@@ -92,7 +113,6 @@ struct MainView: View {
                 dontAskAgain: $dontAskAgain
             )
         }
-
     }
 }
 

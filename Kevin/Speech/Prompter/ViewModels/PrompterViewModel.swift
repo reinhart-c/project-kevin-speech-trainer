@@ -13,12 +13,11 @@ class PrompterViewModel: ObservableObject {
     @Published var prompter: Prompter
     @Published var words: [String] = []
     @Published var currentWordIndex: Int = -1
-    @Published var prompterHasFinished: Bool = false // New: To signal when prompter is done
-
+    @Published var prompterHasFinished: Bool = false 
+    
     private var scriptTimer: Timer?
-    private let highlightingSpeed: TimeInterval = 0.5 // Seconds per word
-
-    // Allow script injection for flexibility, with a default
+    private let highlightingSpeed: TimeInterval = 0.5
+    
     init(script: String = """
         Every once in a while, a revolutionary product comes along that changes everything and
         Apple has been... well, first of all, one’s very fortunate if you get to work on just one of these
@@ -34,7 +33,6 @@ class PrompterViewModel: ObservableObject {
         """) {
         self.prompter = Prompter(script: script)
         self.words = tokenizeScript(script)
-        // Highlighting will be started externally now
     }
 
     private func tokenizeScript(_ script: String) -> [String] {
@@ -43,20 +41,18 @@ class PrompterViewModel: ObservableObject {
 
     func startHighlighting() {
         if words.isEmpty {
-            prompterHasFinished = true // If no words, it's immediately finished
+            prompterHasFinished = true
             return
         }
-        stopHighlighting() // Ensure any existing timer is stopped
         currentWordIndex = -1
-        prompterHasFinished = false // Reset finished flag
-
+        prompterHasFinished = false
         scriptTimer = Timer.scheduledTimer(withTimeInterval: highlightingSpeed, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             if self.currentWordIndex < self.words.count - 1 {
                 self.currentWordIndex += 1
             } else {
-                self.prompterHasFinished = true // Signal prompter finished
-                self.stopHighlighting() // Stop when end of script is reached
+                self.prompterHasFinished = true
+                self.stopHighlighting() 
             }
         }
     }

@@ -21,57 +21,57 @@ struct CategoryCardView: View {
                     .foregroundStyle(category.gradient)
                     .scaledToFit()
                     .frame(width: 400, height: 400)
-                    .offset(x: -350, y: 130)
+                    .offset(x: -90, y: 70)
                     .rotationEffect(.degrees(15))
             } else if category.tag == "Political" {
                 Image(systemName: category.icon)
                     .resizable()
                     .foregroundStyle(category.gradient)
                     .scaledToFit()
-                    .frame(width: 160, height: 160)
-                    .offset(x: -460, y: 100)
+                    .frame(width: 300, height: 300)
+                    .offset(x: -120, y: 100)
                     .rotationEffect(.degrees(10))
             } else { // Social Advocacy
                 Image(systemName: category.icon)
                     .resizable()
                     .foregroundStyle(category.gradient)
                     .scaledToFit()
-                    .frame(width: 200, height: 200)
-                    .offset(x: -440, y: 43)
+                    .frame(width: 370, height: 370)
+                    .offset(x: -80, y: 100)
                     .rotationEffect(.degrees(5))
             }
 
             VStack(alignment: .leading, spacing: 8) {
                 Spacer()
-
-                // title
-                if category.tag == "Product" {
-                    Text(category.title)
-                        .font(.system(size: 33, weight: .medium))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundColor(.black)
-
-                    Text(category.subtitle)
-                        .font(.system(size: 25))
-                        .foregroundColor(.gray)
-
-                } else {
-                    Text(category.title)
-                        .font(.system(size: 25, weight: .medium))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundColor(.black)
-
-                    Text(category.subtitle)
-                        .font(.system(size: 20))
-                        .foregroundColor(.gray)
-                }
+                //title & subtitle
+                Text(category.title)
+                    .font(.system(size: 24, weight: .medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.black)
+                    .frame(minHeight: 50, alignment: .topLeading)
+                    .padding(.bottom, -20)
+                
+                Text(category.subtitle)
+                    .font(.system(size: 20))
+                    .foregroundColor(.gray)
+                    .frame(minHeight: 50, alignment: .topLeading)
+                    .padding(.bottom, 30)
             }
             .padding()
-            .padding(.bottom, 20)
 
             HStack(spacing: 4) {
-                Text("Start Pitch")
-                    .font(.system(size: 20))
+                if category.tag == "Product" {
+                    Text("Product")
+                        .font(.system(size: 20))
+                }
+                else if category.tag == "Political" {
+                    Text("Political")
+                        .font(.system(size: 20))
+                }
+                else{
+                    Text("Social Advocacy")
+                        .font(.system(size: 20))
+                }
             }
             .foregroundColor(.gray)
             .padding(.horizontal, 19)
@@ -79,9 +79,9 @@ struct CategoryCardView: View {
             .background(Color.white.opacity(0.8))
             .clipShape(Capsule())
             .padding([.top, .trailing], 28)
-            .onTapGesture {
-                path.append("SpeechView")
-            }
+//            .onTapGesture {
+//                path.append("SpeechView")
+//            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(category.backgroundColor)
