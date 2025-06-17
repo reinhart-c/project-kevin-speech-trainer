@@ -28,13 +28,14 @@ struct HomeView: View {
                         .bold()
                         .font(.system(size: 48))
                         .padding(.top, 20)
-                        .padding(.leading, 40)
+                        .padding([.bottom, .leading], 40)
                         
                         Spacer()
                         
                         Streak()
                             .padding(.top, 20)
-                            .padding(.trailing, 20)
+                            .padding(.trailing, 40)
+                            .padding(.bottom, 40)
                     }
                     .padding()
                     

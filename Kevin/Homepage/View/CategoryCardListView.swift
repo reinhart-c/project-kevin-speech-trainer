@@ -12,18 +12,14 @@ struct CategoryCardListView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
-            // First card (big one)
             CategoryCardView(category: viewModel.categories[0], path: $path)
-                .frame(width: 700, height: 477)
-
-            // Stacked cards
-            VStack(spacing: 16) {
-                CategoryCardView(category: viewModel.categories[1], path: $path)
-                    .frame(width: 650, height: 230)
-                CategoryCardView(category: viewModel.categories[2], path: $path)
-                    .frame(width: 650, height: 230)
-            }
+                .frame(width: 440, height: 500)
+            CategoryCardView(category: viewModel.categories[1], path: $path)
+                .frame(width: 440, height: 500)
+            CategoryCardView(category: viewModel.categories[2], path: $path)
+                .frame(width: 440, height: 500)
         }
+        .padding()
     }
 }
 
