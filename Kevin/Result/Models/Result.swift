@@ -40,8 +40,6 @@ struct Result {
         self.score = Self.calculateScore(
             expectedWords: expectedWords,
             transcribedWords: transcribedWords,
-            matchedWords: matchedWords,
-            extraWords: extraWords
         )
         
         // Process emotion results
@@ -67,20 +65,28 @@ struct Result {
     private static func calculateScore(
         expectedWords: [String],
         transcribedWords: [String],
-        matchedWords: [String],
-        extraWords: [String]
+        /* drop matchedWords/extraWords here—they’ll be recomputed */
     ) -> Int {
-        guard !expectedWords.isEmpty else { return 0 }
+        guard !expectedWords.isEmpty, !transcribedWords.isEmpty else { return 0 }
         
-        // Base score from matched words
-        let matchPercentage = Double(matchedWords.count) / Double(expectedWords.count)
-        var score = matchPercentage * 100
+        // build counts
+        let expCounts = expectedWords.reduce(into: [String:Int]()) { $0[$1, default:0] += 1 }
+        let transCounts = transcribedWords.reduce(into: [String:Int]()) { $0[$1, default:0] += 1 }
         
-        // Penalty for extra words (filler words, mistakes)
-        let extraWordPenalty = Double(extraWords.count) * 2.0 // 2% penalty per extra word
-        score = max(0, score - extraWordPenalty)
+        // true matched = sum of min counts per word
+        let matched = expCounts.reduce(0) { sum, pair in
+            let (word, expCount) = pair
+            return sum + min(expCount, transCounts[word] ?? 0)
+        }
         
-        return min(100, max(0, Int(score.rounded())))
+        let precision = Double(matched) / Double(transcribedWords.count)
+        let recall    = Double(matched) / Double(expectedWords.count)
+        
+        let f1 = (precision + recall) > 0
+        ? 2 * (precision * recall) / (precision + recall)
+        : 0
+        
+        return Int((f1 * 100).rounded())
     }
     
     private static func processEmotionResults(_ results: [VoiceEmotionClassifierOutput]) -> (String?, Double?, [String: Double]?) {

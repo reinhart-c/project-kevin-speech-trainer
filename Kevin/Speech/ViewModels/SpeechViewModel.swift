@@ -18,6 +18,10 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     @Published var recordedVideos: [URL] = []
     @Published var hasCameraPermissions = false
     
+    @Published var isCountingDown: Bool = false
+    @Published var countdownSeconds: Int = 3
+    private var countdownTimer: Timer?
+    
     // MARK: - Published Properties from SpeechRecognizer
     @Published var transcriptionText = ""
     @Published var isTranscribing = false
@@ -136,9 +140,40 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     }
 
     // MARK: - Recording
-    func startRecording() {
-        guard !isRecording && hasCameraPermissions else { return }
+    func startRecording(onCountdownFinished: @escaping () -> Void) { 
+        guard !isRecording && !isCountingDown && hasCameraPermissions else { return }
         
+        DispatchQueue.main.async {
+            self.isCountingDown = true
+            self.countdownSeconds = 3
+        }
+    
+        countdownTimer?.invalidate() 
+        
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
+            guard let self = self else {
+                timer.invalidate()
+                return
+            }
+            
+            DispatchQueue.main.async {
+                if self.countdownSeconds > 1 {
+                    self.countdownSeconds -= 1
+                } else {
+                    timer.invalidate()
+                    self.countdownTimer = nil
+                    self.isCountingDown = false
+                    self.beginActualRecording(onCountdownFinished: onCountdownFinished) 
+                }
+            }
+        }
+    }
+
+    private func beginActualRecording(onCountdownFinished: @escaping () -> Void) { 
+        guard !isRecording && hasCameraPermissions else { return } 
+        
+        onCountdownFinished() 
+
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let outputURL = documentsPath.appendingPathComponent("recording_\(Date().timeIntervalSince1970).mov")
         
@@ -149,6 +184,16 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     }
     
     func stopRecording() {
+        if isCountingDown { 
+            countdownTimer?.invalidate()
+            countdownTimer = nil
+            DispatchQueue.main.async {
+                self.isCountingDown = false
+                self.countdownSeconds = 3 
+            }
+            return
+        }
+        
         guard isRecording else { return }
         movieFileOutput.stopRecording() // Delegate will set isRecording to false
     }
