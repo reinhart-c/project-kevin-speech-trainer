@@ -34,11 +34,11 @@ class PrompterViewModel: ObservableObject {
         self.prompter = Prompter(script: script)
         self.words = tokenizeScript(script)
     }
-    
+
     private func tokenizeScript(_ script: String) -> [String] {
         return script.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
     }
-    
+
     func startHighlighting() {
         if words.isEmpty {
             prompterHasFinished = true
@@ -46,7 +46,6 @@ class PrompterViewModel: ObservableObject {
         }
         currentWordIndex = -1
         prompterHasFinished = false
-        
         scriptTimer = Timer.scheduledTimer(withTimeInterval: highlightingSpeed, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             if self.currentWordIndex < self.words.count - 1 {
@@ -57,24 +56,24 @@ class PrompterViewModel: ObservableObject {
             }
         }
     }
-    
+
     func stopHighlighting() {
         scriptTimer?.invalidate()
         scriptTimer = nil
     }
-    
+
     func resetHighlighting() {
         stopHighlighting()
         currentWordIndex = -1
         prompterHasFinished = false
     }
-    
+
     func updateScript(_ newScript: String) {
         prompter.script = newScript
         words = tokenizeScript(newScript)
         resetHighlighting() // Reset state if script changes
     }
-    
+
     deinit {
         stopHighlighting()
     }

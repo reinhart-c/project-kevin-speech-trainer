@@ -8,25 +8,24 @@
 import SwiftUI
 
 struct MainView: View {
-    
+
     @StateObject var speechViewModel = SpeechViewModel()
     @State private var showConfirmationModal = false
     @State private var confirmationAction: ConfirmationModalView.ActionType?
     @State private var dontAskAgain = false
-    
+
     var body: some View {
-<<<<<<< SpeechRevision
         VStack {
             HStack {
-                Text("Product deserves the spotlight") //category.title
+                Text("Product deserves the spotlight") // category.title
                     .font(.system(size: 30, weight: .semibold))
                     .padding(.leading, 40)
-                
+
                 Spacer()
-                
-                //retry
-                Button{
-                    //retry session
+
+                // retry
+                Button {
+                    // retry session
                     if dontAskAgain {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
@@ -34,33 +33,6 @@ struct MainView: View {
                     } else {
                         confirmationAction = .retry
                         showConfirmationModal = true
-=======
-        ScrollView {
-            VStack {
-                HStack {
-                    Text("Product deserves the spotlight") //category.title
-                        .font(.system(size: 30, weight: .semibold))
-                        .padding(.leading, 40)
-                    
-                    Spacer()
-                    
-                    //retry
-                    Button{
-                        //retry session
-                        if dontAskAgain {
-                            speechViewModel.stopRecording()
-                            speechViewModel.stopSession()
-                            speechViewModel.startRecording()
-                        } else {
-                            confirmationAction = .retry
-                            showConfirmationModal = true
-                        }
-                        
-                    } label:{
-                        Image(systemName: "arrow.trianglehead.clockwise")
-                            .font(.system(size: 30))
-                            .foregroundStyle(Color.gray)
->>>>>>> mainView
                     }
                     .buttonStyle(PlainButtonStyle())
                     .padding()
@@ -93,6 +65,7 @@ struct MainView: View {
                 
                 HStack {
                     SpeechView()
+
                 }
             }
             .padding()
@@ -118,9 +91,8 @@ struct MainView: View {
                 )
             }
         }
-<<<<<<< SpeechRevision
         .padding()
-        
+
         .sheet(item: $confirmationAction) { action in
             ConfirmationModalView(
                 actionType: action,
@@ -141,12 +113,8 @@ struct MainView: View {
                 dontAskAgain: $dontAskAgain
             )
         }
-=======
->>>>>>> mainView
-
     }
 }
-
 
 #Preview {
     MainView()

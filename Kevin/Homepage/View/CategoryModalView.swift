@@ -10,7 +10,7 @@ import SwiftUI
 struct CategoryModalView: View {
     var category: Category
     var onReady: () -> Void
-    
+
     @State private var title: String = ""
     @Environment(\.dismiss) private var dismiss
 
@@ -38,7 +38,6 @@ struct CategoryModalView: View {
                 )
                 .frame(width: 500)
                 .foregroundStyle(Color.black)
-            
 
             HStack {
                 Button {

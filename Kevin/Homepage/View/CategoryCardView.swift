@@ -5,7 +5,6 @@
 //  Created by Alifa Reppawali on 12/06/25.
 //
 
-
 import SwiftUI
 
 struct CategoryCardView: View {
@@ -14,8 +13,8 @@ struct CategoryCardView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            
-            //background icon
+
+            // background icon
             if category.tag == "Product" {
                 Image(systemName: category.icon)
                     .resizable()
@@ -24,8 +23,7 @@ struct CategoryCardView: View {
                     .frame(width: 400, height: 400)
                     .offset(x: -90, y: 70)
                     .rotationEffect(.degrees(15))
-            }
-            else if category.tag == "Political"{
+            } else if category.tag == "Political" {
                 Image(systemName: category.icon)
                     .resizable()
                     .foregroundStyle(category.gradient)
@@ -33,8 +31,7 @@ struct CategoryCardView: View {
                     .frame(width: 300, height: 300)
                     .offset(x: -120, y: 100)
                     .rotationEffect(.degrees(10))
-            }
-            else { //Social Advocacy
+            } else { // Social Advocacy
                 Image(systemName: category.icon)
                     .resizable()
                     .foregroundStyle(category.gradient)
@@ -43,10 +40,9 @@ struct CategoryCardView: View {
                     .offset(x: -80, y: 100)
                     .rotationEffect(.degrees(5))
             }
-            
+
             VStack(alignment: .leading, spacing: 8) {
                 Spacer()
-                
                 //title & subtitle
                 Text(category.title)
                     .font(.system(size: 24, weight: .medium))
@@ -60,7 +56,6 @@ struct CategoryCardView: View {
                     .foregroundColor(.gray)
                     .frame(minHeight: 50, alignment: .topLeading)
                     .padding(.bottom, 30)
-                
             }
             .padding()
 
@@ -91,7 +86,7 @@ struct CategoryCardView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(category.backgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: 20))
-        //.padding()
+        // .padding()
     }
 }
 
@@ -104,5 +99,5 @@ struct CategoryCardView: View {
 //        icon: "flame"
 //    ))
 //    .padding()
-    //.previewLayout(.sizeThatFits)
+    // .previewLayout(.sizeThatFits)
 }

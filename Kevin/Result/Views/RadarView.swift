@@ -24,11 +24,11 @@ struct RadarView: View {
                         .stroke(Color.gray.opacity(0.2), lineWidth: 0.5)
                         .frame(width: maxRadius * 2 * CGFloat(scale), height: maxRadius * 2 * CGFloat(scale))
                 }
-                
+
                 // Axes
-                ForEach(0..<count, id: \.self) { i in
+                ForEach(0..<count, id: \.self) { idx in
                     Path { path in
-                        let angle = angleStep * Double(i) - .pi / 2
+                        let angle = angleStep * Double(idx) - .pi / 2
                         let endX = center.x + maxRadius * cos(angle)
                         let endY = center.y + maxRadius * sin(angle)
                         path.move(to: center)
@@ -39,15 +39,15 @@ struct RadarView: View {
 
                 // Radar Polygon Fill
                 Path { path in
-                    for i in 0..<count {
-                        let angle = angleStep * Double(i) - .pi / 2
-                        let value = min(max(dataPoints[i].value, 0), 1)
-                        let x = center.x + maxRadius * CGFloat(value) * cos(angle)
-                        let y = center.y + maxRadius * CGFloat(value) * sin(angle)
-                        if i == 0 {
-                            path.move(to: CGPoint(x: x, y: y))
+                    for idx in 0..<count {
+                        let angle = angleStep * Double(idx) - .pi / 2
+                        let value = min(max(dataPoints[idx].value, 0), 1)
+                        let xCoor = center.x + maxRadius * CGFloat(value) * cos(angle)
+                        let yCoor = center.y + maxRadius * CGFloat(value) * sin(angle)
+                        if idx == 0 {
+                            path.move(to: CGPoint(x: xCoor, y: yCoor))
                         } else {
-                            path.addLine(to: CGPoint(x: x, y: y))
+                            path.addLine(to: CGPoint(x: xCoor, y: yCoor))
                         }
                     }
                     path.closeSubpath()
@@ -62,38 +62,38 @@ struct RadarView: View {
 
                 // Radar Polygon Stroke
                 Path { path in
-                    for i in 0..<count {
-                        let angle = angleStep * Double(i) - .pi / 2
-                        let value = min(max(dataPoints[i].value, 0), 1)
-                        let x = center.x + maxRadius * CGFloat(value) * cos(angle)
-                        let y = center.y + maxRadius * CGFloat(value) * sin(angle)
-                        if i == 0 {
-                            path.move(to: CGPoint(x: x, y: y))
+                    for idx in 0..<count {
+                        let angle = angleStep * Double(idx) - .pi / 2
+                        let value = min(max(dataPoints[idx].value, 0), 1)
+                        let xCoor = center.x + maxRadius * CGFloat(value) * cos(angle)
+                        let yCoor = center.y + maxRadius * CGFloat(value) * sin(angle)
+                        if idx == 0 {
+                            path.move(to: CGPoint(x: xCoor, y: yCoor))
                         } else {
-                            path.addLine(to: CGPoint(x: x, y: y))
+                            path.addLine(to: CGPoint(x: xCoor, y: yCoor))
                         }
                     }
                     path.closeSubpath()
                 }
                 .stroke(Color.blue, lineWidth: 2)
-                
+
                 // Data points
-                ForEach(0..<count, id: \.self) { i in
-                    let angle = angleStep * Double(i) - .pi / 2
-                    let value = min(max(dataPoints[i].value, 0), 1)
-                    let x = center.x + maxRadius * CGFloat(value) * cos(angle)
-                    let y = center.y + maxRadius * CGFloat(value) * sin(angle)
-                    
+                ForEach(0..<count, id: \.self) { idx in
+                    let angle = angleStep * Double(idx) - .pi / 2
+                    let value = min(max(dataPoints[idx].value, 0), 1)
+                    let xCoor = center.x + maxRadius * CGFloat(value) * cos(angle)
+                    let yCoor = center.y + maxRadius * CGFloat(value) * sin(angle)
+
                     Circle()
-                        .fill(emotionColor(for: dataPoints[i].label))
+                        .fill(emotionColor(for: dataPoints[idx].label))
                         .frame(width: 6, height: 6)
-                        .position(x: x, y: y)
+                        .position(x: xCoor, y: yCoor)
                 }
 
                 // Labels
-                ForEach(0..<count, id: \.self) { i in
-                    let angle = angleStep * Double(i) - .pi / 2
-                    let label = dataPoints[i].label
+                ForEach(0..<count, id: \.self) { idx in
+                    let angle = angleStep * Double(idx) - .pi / 2
+                    let label = dataPoints[idx].label
                     let labelX = center.x + (maxRadius + 20) * cos(angle)
                     let labelY = center.y + (maxRadius + 20) * sin(angle)
 
@@ -108,7 +108,7 @@ struct RadarView: View {
         }
         .frame(width: 250, height: 250)
     }
-    
+
     private func emotionColor(for emotion: String) -> Color {
         switch emotion.lowercased() {
         case "happy", "joy": return .yellow

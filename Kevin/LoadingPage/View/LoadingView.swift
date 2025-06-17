@@ -9,16 +9,16 @@ import Lottie
 import SwiftUI
 
 struct LoadingView: View {
-    
+
     @State private var shimmerOffset: CGFloat = -1.0
-    
+
     var body: some View {
         ZStack {
             LottieView(filename: "LoadingPaperPlaneAimation")
                 .frame(width: 800, height: 800)
-            
-            VStack{
-                
+
+            VStack {
+
                 let gradientText = Text("Processing Your Speech...")
                     .font(.system(size: 28))
                     .fontWeight(.semibold)
@@ -27,7 +27,7 @@ struct LoadingView: View {
                             colors: [.purpleTitle, .blueTitle],
                             startPoint: .leading,
                             endPoint: .trailing))
-                
+
                 // Shimmer overlay
                 let shimmer = LinearGradient(
                     gradient: Gradient(colors: [
@@ -39,9 +39,9 @@ struct LoadingView: View {
                     endPoint: .trailing
                 )
                     .frame(width: 330, height: 50)
-                    //.rotationEffect(.degrees(10))
+                    // .rotationEffect(.degrees(10))
                     .offset(x: shimmerOffset * 300)
-                
+
                 gradientText
                     .overlay(
                         shimmer

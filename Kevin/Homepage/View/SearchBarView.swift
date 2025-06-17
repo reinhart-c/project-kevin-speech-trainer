@@ -33,7 +33,7 @@ struct SearchBarView: View {
             RoundedRectangle(cornerRadius: 30)
                 .stroke(Color.gray.opacity(0.2))
         )
-        .frame(width:230)
+        .frame(width: 230)
         .padding(.horizontal)
     }
 }
