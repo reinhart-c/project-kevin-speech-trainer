@@ -31,8 +31,8 @@ struct CategoryCardListView: View {
         }
         .padding()
         .sheet(item: $presentedCategory) { category in
-            CategoryModalView(category: category) {
-                path.append("SpeechView")
+            CategoryModalView(category: category) { recordingTitle in
+                path.append(recordingTitle) 
             }
         }
     }

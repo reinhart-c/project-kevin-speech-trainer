@@ -20,6 +20,10 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     @Published var isCountingDown: Bool = false
     @Published var countdownSeconds: Int = 3
     private var countdownTimer: Timer?
+    
+    @Published var recordingTitles: [URL: String] = [:]
+    @Published var currentRecordingTitle: String = ""
+    
     // MARK: - Published Properties from SpeechRecognizer
     @Published var transcriptionText = ""
     @Published var isTranscribing = false
@@ -42,6 +46,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     override init() {
         super.init()
         loadRecordings() // Load existing recordings on init
+        loadRecordingTitles()
     }
 
     // MARK: - Camera Setup and Permissions
@@ -212,7 +217,11 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
                 print("Recording saved to: \(outputFileURL)")
                 self.lastRecordedVideoURL = outputFileURL
                 self.recordedVideos.append(outputFileURL)
+                
+                self.recordingTitles[outputFileURL] = self.currentRecordingTitle.isEmpty ? "Untitled Recording" : self.currentRecordingTitle
+                
                 self.sortRecordings()
+                self.saveRecordingTitles()
 
                 // Start both transcription and emotion detection
                 self.transcribeVideo(url: outputFileURL)
@@ -255,9 +264,11 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
         do {
             try FileManager.default.removeItem(at: url)
             recordedVideos.removeAll { $0 == url }
+            recordingTitles.removeValue(forKey: url) // Also remove the title
             if lastRecordedVideoURL == url {
                 lastRecordedVideoURL = recordedVideos.first // newest if sorted
             }
+            saveRecordingTitles() // Save after deletion
             print("Successfully deleted recording: \(url)")
         } catch {
             print("Error deleting recording \(url): \(error.localizedDescription)")
@@ -273,7 +284,9 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             }
         }
         recordedVideos.removeAll()
+        recordingTitles.removeAll() // Clear all titles
         lastRecordedVideoURL = nil
+        saveRecordingTitles() // Save after clearing
     }
 
     // MARK: - Speech Recognition
@@ -483,6 +496,32 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
                     print("Error during emotion detection: \(error)")
                 }
             }
+        }
+    }
+ 
+    // MARK: - Recording Title Management
+    func setRecordingTitle(_ title: String) {
+        currentRecordingTitle = title
+    }
+    
+    func getRecordingTitle(for url: URL) -> String {
+        return recordingTitles[url] ?? "Untitled Recording"
+    }
+    
+    // MARK: - Recording Title Persistence
+    private func saveRecordingTitles() {
+        let titlesData = recordingTitles.mapValues { $0 }.reduce(into: [String: String]()) { result, pair in
+            result[pair.key.absoluteString] = pair.value
+        }
+        UserDefaults.standard.set(titlesData, forKey: "recordingTitles")
+    }
+
+    private func loadRecordingTitles() {
+        if let titlesData = UserDefaults.standard.dictionary(forKey: "recordingTitles") as? [String: String] {
+            recordingTitles = Dictionary(uniqueKeysWithValues: titlesData.compactMap { key, value in
+                guard let url = URL(string: key) else { return nil }
+                return (url, value)
+            })
         }
     }
 }

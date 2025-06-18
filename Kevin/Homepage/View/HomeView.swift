@@ -11,13 +11,14 @@ struct HomeView: View {
     @StateObject private var viewModel = CategoryViewModel()
     @StateObject private var speechViewModel = SpeechViewModel()
     @State private var path = NavigationPath()
+    
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack {
                     HStack {
                         (
-                            Text("**“Say It”**")
+                            Text("\"Say It\"")
                                 .foregroundStyle(
                                     LinearGradient(colors: [.purpleTitle, .blueTitle], startPoint: .leading, endPoint: .trailing))
 
@@ -55,8 +56,7 @@ struct HomeView: View {
                     ScrollView {
                         LazyVStack {
                             ForEach(speechViewModel.recordedVideos, id: \.self) { url in
-                                let index = speechViewModel.recordedVideos.firstIndex(of: url) ?? -1
-                                let recordingTitle = "Recording \(speechViewModel.recordedVideos.count - index)"
+                                let recordingTitle = speechViewModel.getRecordingTitle(for: url)
                                 ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
                             }
                         }
@@ -66,14 +66,15 @@ struct HomeView: View {
             }.onAppear {
                 speechViewModel.loadRecordings()
             }
-            .navigationDestination(for: String.self) { val in
-                if val == "SpeechView" {
-                    SpeechView()
-                }
+            .navigationDestination(for: String.self) { recordingTitle in
+                SpeechView()
+                    .onAppear {
+                        speechViewModel.setRecordingTitle(recordingTitle)
+                    }
             }
         }
     }
-
+    
     private func formatDate(from url: URL) -> String {
         let filename = url.lastPathComponent
         if let timeInterval = Double(filename.replacingOccurrences(of: "recording_", with: "").replacingOccurrences(of: ".mov", with: "")) {

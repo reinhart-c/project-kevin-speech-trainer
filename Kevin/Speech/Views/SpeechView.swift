@@ -247,8 +247,7 @@ struct SpeechView: View {
                             ForEach(speechViewModel.recordedVideos, id: \.self) { url in
                                 HStack {
                                     VStack(alignment: .leading) {
-                                        let index = speechViewModel.recordedVideos.firstIndex(of: url) ?? -1
-                                        Text("Recording \(speechViewModel.recordedVideos.count - index)")
+                                        Text(speechViewModel.getRecordingTitle(for: url))
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                         Text(formatDate(from: url))
