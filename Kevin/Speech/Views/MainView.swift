@@ -22,7 +22,7 @@ struct MainView: View {
                     .padding(.leading, 40)
 
                 Spacer()
-
+                
                 // retry
                 Button {
                     // retry session
@@ -35,12 +35,11 @@ struct MainView: View {
                         showConfirmationModal = true
                     }
                 } label: {
-                    Text("Retry")
-                        .foregroundStyle(.white)
+                    Image(systemName: "arrow.trianglehead.clockwise")
+                        .foregroundStyle(.gray)
                         .font(.system(size: 20))
                 }
                 .padding()
-                .background(Color.blue)
                 .cornerRadius(30)
                 .buttonStyle(PlainButtonStyle())
                 .padding(.trailing, 10)

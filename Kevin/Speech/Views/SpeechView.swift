@@ -20,14 +20,137 @@ struct SpeechView: View {
     @State private var showingResult = false
     @State private var videoPlayer: AVPlayer?
     @State private var isVideoPlaying = false
+    
+    @State private var showConfirmationModal = false
+    @State private var confirmationAction: ConfirmationModalView.ActionType?
+    @State private var dontAskAgain = false
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Speech Training")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding(.top)
-
+            // Simplified control buttons based on state -> moved to up
+            HStack(spacing: 30) {
+                
+                Text("Product deserves the spotlight") // category.title
+                    .font(.system(size: 30, weight: .semibold))
+                    .padding(.leading, 40)
+                
+                Spacer()
+                
+                if showingVideoPlayer {
+                    // Video playback controls
+                    Button(action: {
+                        if isVideoPlaying {
+                            videoPlayer?.pause()
+                            isVideoPlaying = false
+                        } else {
+                            videoPlayer?.play()
+                            isVideoPlaying = true
+                        }
+                    }) {
+                        VStack {
+                            Circle()
+                                .fill(isVideoPlaying ? Color.orange : Color.blue)
+                                .frame(width: 100, height: 100)
+                                .overlay(
+                                    Image(systemName: isVideoPlaying ? "pause.fill" : "play.fill")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 32))
+                                )
+                            Text(isVideoPlaying ? "Pause" : "Play")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    
+                } else {
+                    // Recording controls
+                    if speechViewModel.isRecording {
+                        
+                        // Try Again button for video playback state
+                        Button {
+                            // retry session
+                            if dontAskAgain {
+                                // Reset to camera view
+                                showingVideoPlayer = false
+                                showingResult = false
+                                resultViewModel.reset()
+                                prompterViewModel.resetHighlighting()
+                                speechViewModel.transcriptionText = ""
+                                speechViewModel.transcriptionError = nil
+                                speechViewModel.emotionResults = []
+                                videoPlayer?.pause()
+                                videoPlayer = nil
+                                isVideoPlaying = false
+                            } else {
+                                confirmationAction = .retry
+                                showConfirmationModal = true
+                            }
+                        } label: {
+                            Image(systemName: "arrow.trianglehead.clockwise")
+                                .foregroundStyle(.gray)
+                                .font(.system(size: 20))
+                        }
+                        .padding()
+                        .cornerRadius(30)
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.trailing, 10)
+                        
+                        // Show Stop button when recording
+                        Button {
+                            //endSession
+                            if dontAskAgain {
+                                speechViewModel.stopRecording()
+                                prompterViewModel.stopHighlighting()
+                            } else {
+                                confirmationAction = .endSession
+                                showConfirmationModal = true
+                            }
+                        } label: {
+                            Text("End Session")
+                                .foregroundStyle(.white)
+                                .font(.system(size: 20))
+                        }
+                        .padding()
+                        .background(Color.red)
+                        .cornerRadius(30)
+                        .buttonStyle(PlainButtonStyle())
+                        .disabled(!speechViewModel.hasCameraPermissions)
+                        
+                    } else {
+                        // Always show Record button when not recording and in camera mode
+                        Button(action: {
+                            showingResult = false
+                            resultViewModel.reset()
+                            prompterViewModel.resetHighlighting()
+                            speechViewModel.startRecording {
+                                prompterViewModel.startHighlighting()
+                            }
+                            showingVideoPlayer = false
+                            speechViewModel.transcriptionText = ""
+                            speechViewModel.transcriptionError = nil
+                            speechViewModel.emotionResults = []
+                        }) {
+                            VStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 100, height: 100)
+                                    .overlay(
+                                        Image(systemName: "record.circle")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 32))
+                                    )
+                                Text("Record")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        .disabled(!speechViewModel.hasCameraPermissions)
+                    }
+                    ProgressBar()
+                        .padding(.trailing, 40)
+                }
+            }
+            .padding()
             HStack(spacing: 20) {
                 ZStack {
                     if showingVideoPlayer, let videoURL = speechViewModel.lastRecordedVideoURL {
@@ -109,118 +232,6 @@ struct SpeechView: View {
                                (showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil) ?
                                (isVideoPlaying ? .blue : .orange) : .primary)
 
-            // Simplified control buttons based on state
-            HStack(spacing: 30) {
-                if showingVideoPlayer {
-                    // Video playback controls
-                    Button(action: {
-                        if isVideoPlaying {
-                            videoPlayer?.pause()
-                            isVideoPlaying = false
-                        } else {
-                            videoPlayer?.play()
-                            isVideoPlaying = true
-                        }
-                    }) {
-                        VStack {
-                            Circle()
-                                .fill(isVideoPlaying ? Color.orange : Color.blue)
-                                .frame(width: 100, height: 100)
-                                .overlay(
-                                    Image(systemName: isVideoPlaying ? "pause.fill" : "play.fill")
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 32))
-                                )
-                            Text(isVideoPlaying ? "Pause" : "Play")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                        }
-                    }
-
-                    // Try Again button for video playback state
-                    Button(action: {
-                        // Reset to camera view
-                        showingVideoPlayer = false
-                        showingResult = false
-                        resultViewModel.reset()
-                        prompterViewModel.resetHighlighting()
-                        speechViewModel.transcriptionText = ""
-                        speechViewModel.transcriptionError = nil
-                        speechViewModel.emotionResults = []
-                        videoPlayer?.pause()
-                        videoPlayer = nil
-                        isVideoPlaying = false
-                    }) {
-                        VStack {
-                            Circle()
-                                .fill(Color.green)
-                                .frame(width: 100, height: 100)
-                                .overlay(
-                                    Image(systemName: "arrow.clockwise")
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 32))
-                                )
-                            Text("Try Again")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                        }
-                    }
-                } else {
-                    // Recording controls
-                    if speechViewModel.isRecording {
-                        // Show Stop button when recording
-                        Button(action: {
-                            speechViewModel.stopRecording()
-                            prompterViewModel.stopHighlighting()
-                        }) {
-                            VStack {
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 100, height: 100)
-                                    .overlay(
-                                        Image(systemName: "stop.fill")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 32))
-                                    )
-                                Text("Stop")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                            }
-                        }
-                        .disabled(!speechViewModel.hasCameraPermissions)
-                    } else {
-                        // Always show Record button when not recording and in camera mode
-                        Button(action: {
-                            showingResult = false
-                            resultViewModel.reset()
-                            prompterViewModel.resetHighlighting()
-                            speechViewModel.startRecording {
-                                prompterViewModel.startHighlighting()
-                            }
-                            showingVideoPlayer = false
-                            speechViewModel.transcriptionText = ""
-                            speechViewModel.transcriptionError = nil
-                            speechViewModel.emotionResults = []
-                        }) {
-                            VStack {
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 100, height: 100)
-                                    .overlay(
-                                        Image(systemName: "record.circle")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 32))
-                                    )
-                                Text("Record")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                            }
-                        }
-                        .disabled(!speechViewModel.hasCameraPermissions)
-                    }
-                }
-            }
-            .padding()
             if !speechViewModel.recordedVideos.isEmpty && !speechViewModel.isRecording {
                 VStack(alignment: .leading) {
                     HStack {
@@ -305,6 +316,26 @@ struct SpeechView: View {
             }
 
             Spacer()
+        }
+        .sheet(item: $confirmationAction) { action in
+            ConfirmationModalView(
+                actionType: action,
+                onConfirm: {
+                    if action == .endSession {
+                        speechViewModel.stopRecording()
+                        speechViewModel.stopSession()
+                    } else if action == .retry {
+                        speechViewModel.stopRecording()
+                        speechViewModel.stopSession()
+                        speechViewModel.startRecording{}
+                    }
+                    confirmationAction = nil
+                },
+                onCancel: {
+                    confirmationAction = nil
+                },
+                dontAskAgain: $dontAskAgain
+            )
         }
         .onAppear {
             speechViewModel.setupCamera()

@@ -52,7 +52,7 @@ struct SpeechResultView: View {
             }
             HStack {
                 Rectangle()
-               //ResultView() //score and emotion
+                //ResultView() //score and emotion
             }
             .padding([.leading, .trailing], 40)
             .background(Color.lightBlue)

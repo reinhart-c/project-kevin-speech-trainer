@@ -9,26 +9,97 @@ import SwiftUI
 
 struct PrompterView: View {
     @ObservedObject var viewModel: PrompterViewModel
-
+    @StateObject private var speechViewModel = SpeechViewModel()
+    @StateObject private var prompterViewModel = PrompterViewModel()
+    @StateObject private var resultViewModel = ResultViewModel()
+    
+    @State private var showingResult = false
+    @State private var showingVideoPlayer = false
+    
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Teleprompter")
-                .font(.headline)
-                .padding(.bottom, 5)
-            ScrollView {
-                viewModel.words.enumerated().reduce(Text("")) { (accumulatedText, pair) in
-                    let (index, word) = pair
-                    return accumulatedText +
-                           Text(word + " ")
-                               .font(.title3)
-                               .foregroundColor(index == viewModel.currentWordIndex ? Color.accentColor : Color.primary) // Highlight current word
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
+            ZStack {
+                // Main content with corner radius
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.gray.opacity(0.1))
+                    .overlay(
+                        ScrollView {
+                            if !speechViewModel.isRecording{
+                                
+                                Text("Get Ready to Speak!\n\n")
+                                    .foregroundStyle(.gray)
+                                    .font(.system(size: 20, weight: .semibold))
+                                
+                                
+                                Text("\n\n\nMake sure your body language is visible. Take a breath, and show your best self")
+                                    .padding()
+                                    .foregroundStyle(.gray)
+                                    .font(.system(size: 15))
+                                    .multilineTextAlignment(.center)
+                                
+                                // Always show Record button when not recording and in camera mode
+                                Button{
+                                    showingResult = false
+                                    resultViewModel.reset()
+                                    prompterViewModel.resetHighlighting()
+                                    speechViewModel.startRecording {
+                                        prompterViewModel.startHighlighting()
+                                    }
+                                    showingVideoPlayer = false
+                                    speechViewModel.transcriptionText = ""
+                                    speechViewModel.transcriptionError = nil
+                                    speechViewModel.emotionResults = []
+                                } label:{
+                                    Text("Start Now")
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 30)
+                                        .padding(.vertical, 12)
+                                        .background(Color.black)
+                                        .clipShape(Capsule())
+                                }
+                                .padding(.top, 200)
+                                .buttonStyle(PlainButtonStyle())
+                                .disabled(!speechViewModel.hasCameraPermissions)
+                                
+                            }
+                            else{
+                                viewModel.words.enumerated().reduce(Text("")) { (accumulatedText, pair) in
+                                    let (index, word) = pair
+                                    return accumulatedText +
+                                    Text(word + " ")
+                                    //.font(.title3)
+                                        .font(.system(size:19, weight: .medium))
+                                        .foregroundColor(index == viewModel.currentWordIndex ? Color.accentColor : Color.primary) // Highlight current word
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+                            .frame(height: 380)
+                        // Apply corner radius to scroll content too
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    )
+                    .mask(
+                        VStack(spacing: 0) {
+                            LinearGradient(
+                                gradient: Gradient(colors: [.clear, .black]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .frame(height: 30)
+                            
+                            Rectangle().fill(Color.black)
+                            
+                            LinearGradient(
+                                gradient: Gradient(colors: [.black, .clear]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .frame(height: 30)
+                        }
+                    )
+                    .frame(height: 380)
             }
-            .frame(height: 380)
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(10)
         }
         .frame(width: 300)
     }
