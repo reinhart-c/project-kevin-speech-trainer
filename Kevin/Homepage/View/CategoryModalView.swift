@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CategoryModalView: View {
     var category: Category
-    var onReady: () -> Void
+    var onReady: (String) -> Void  
 
     @State private var title: String = ""
     @Environment(\.dismiss) private var dismiss
@@ -57,7 +57,8 @@ struct CategoryModalView: View {
                 Spacer()
                 
                 Button {
-                    onReady()
+                    let recordingTitle = title.isEmpty ? "Untitled Practice" : title
+                    onReady(recordingTitle)
                     dismiss()
                 } label: {
                     Text("I'm Ready")
@@ -89,6 +90,6 @@ struct CategoryModalView: View {
             backgroundColor: Color.lightBlue,
             icon: "lightbulb.max"
         ),
-        onReady: {}
+        onReady: { title in print("Recording title: \(title)") }
     )
 }

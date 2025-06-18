@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SearchBarView: View {
-    @State private var searchText: String = ""
+    @Binding var searchText: String
 
     var body: some View {
         HStack {
@@ -18,11 +18,24 @@ struct SearchBarView: View {
                 .background(Color.black)
                 .clipShape(Circle())
 
-            TextField("Search", text: $searchText)
+            TextField("Search recordings...", text: $searchText)
                 .font(.system(size: 18))
-                .foregroundColor(.gray)
+                .foregroundColor(.black) 
+                .accentColor(.blue) 
                 .textFieldStyle(PlainTextFieldStyle())
                 .padding(.vertical, 10)
+            
+            // Add clear button when there's text
+            if !searchText.isEmpty {
+                Button(action: {
+                    searchText = ""
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.gray)
+                        .font(.system(size: 16))
+                }
+                .padding(.trailing, 4)
+            }
         }
         .padding(.horizontal, 6)
         .background(
@@ -39,5 +52,7 @@ struct SearchBarView: View {
 }
 
 #Preview {
-    SearchBarView()
+    @State var searchText = "test"
+    return SearchBarView(searchText: $searchText)
+        .background(Color.gray.opacity(0.2)) 
 }

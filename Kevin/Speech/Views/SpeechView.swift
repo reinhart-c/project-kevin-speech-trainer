@@ -10,7 +10,7 @@ import AVFoundation
 import AVKit
 
 struct SpeechView: View {
-    @StateObject private var speechViewModel = SpeechViewModel()
+    @ObservedObject var speechViewModel: SpeechViewModel
     @StateObject private var prompterViewModel = PrompterViewModel()
     @StateObject private var resultViewModel = ResultViewModel()
 
@@ -24,6 +24,10 @@ struct SpeechView: View {
     @State private var showConfirmationModal = false
     @State private var confirmationAction: ConfirmationModalView.ActionType?
     @State private var dontAskAgain = false
+
+    init(speechViewModel: SpeechViewModel = SpeechViewModel()) {
+        self.speechViewModel = speechViewModel
+    }
 
     var body: some View {
         VStack(spacing: 20) {
@@ -151,7 +155,7 @@ struct SpeechView: View {
                             .aspectRatio(16/9, contentMode: .fit)
                             .cornerRadius(15)
                             .onAppear {
-                                if videoPlayer == nil { // Ensure player is initialized only once
+                                if videoPlayer == nil {
                                     videoPlayer = AVPlayer(url: videoURL)
                                 }
                             }
@@ -162,7 +166,7 @@ struct SpeechView: View {
                             .cornerRadius(15)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.gray.opacity(0.5), lineWidth: 1) // Optional border
+                                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
                             )
                     }
 
@@ -181,9 +185,9 @@ struct SpeechView: View {
                                 .padding(.horizontal)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.black.opacity(0.1)) // Semi-transparent background
+                        .background(Color.black.opacity(0.1))
                         .cornerRadius(15)
-                    } else if speechViewModel.isCountingDown { // Display countdown
+                    } else if speechViewModel.isCountingDown {
                         Text("\(speechViewModel.countdownSeconds)")
                             .font(.system(size: 100, weight: .bold))
                             .foregroundColor(.white)
@@ -194,10 +198,8 @@ struct SpeechView: View {
                     }
                 }
 
-                // Show ResultView instead of PrompterView when recording is finished and we have results
                 if showingResult {
                     ResultView(viewModel: resultViewModel) {
-                        // Reset action
                         showingResult = false
                         showingVideoPlayer = false
                         resultViewModel.reset()
@@ -225,15 +227,122 @@ struct SpeechView: View {
             }
             .padding(.horizontal)
             
-            Text(speechViewModel.isCountingDown ? "Get ready..." : // Display "Get ready..." during countdown
+            Text(speechViewModel.isCountingDown ? "Get ready..." :
                  speechViewModel.isRecording ? "Recording in progress..." :
                  showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil ?
                  (isVideoPlaying ? "Playing recorded video" : "Video paused") : "Ready to record")
                 .font(.headline)
-                .foregroundColor(speechViewModel.isCountingDown ? .blue : // Color for countdown text
+                .foregroundColor(speechViewModel.isCountingDown ? .blue :
                                  speechViewModel.isRecording ? .red :
                                (showingVideoPlayer && speechViewModel.lastRecordedVideoURL != nil) ?
                                (isVideoPlaying ? .blue : .orange) : .primary)
+
+            HStack(spacing: 30) {
+                if showingVideoPlayer {
+                    Button(action: {
+                        if isVideoPlaying {
+                            videoPlayer?.pause()
+                            isVideoPlaying = false
+                        } else {
+                            videoPlayer?.play()
+                            isVideoPlaying = true
+                        }
+                    }) {
+                        VStack {
+                            Circle()
+                                .fill(isVideoPlaying ? Color.orange : Color.blue)
+                                .frame(width: 100, height: 100)
+                                .overlay(
+                                    Image(systemName: isVideoPlaying ? "pause.fill" : "play.fill")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 32))
+                                )
+                            Text(isVideoPlaying ? "Pause" : "Play")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                    }
+
+                    Button(action: {
+                        showingVideoPlayer = false
+                        showingResult = false
+                        resultViewModel.reset()
+                        prompterViewModel.resetHighlighting()
+                        speechViewModel.transcriptionText = ""
+                        speechViewModel.transcriptionError = nil
+                        speechViewModel.emotionResults = []
+                        videoPlayer?.pause()
+                        videoPlayer = nil
+                        isVideoPlaying = false
+                    }) {
+                        VStack {
+                            Circle()
+                                .fill(Color.green)
+                                .frame(width: 100, height: 100)
+                                .overlay(
+                                    Image(systemName: "arrow.clockwise")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 32))
+                                )
+                            Text("Try Again")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                    }
+                } else {
+                    if speechViewModel.isRecording {
+                        Button(action: {
+                            speechViewModel.stopRecording()
+                            prompterViewModel.stopHighlighting()
+                        }) {
+                            VStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 100, height: 100)
+                                    .overlay(
+                                        Image(systemName: "stop.fill")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 32))
+                                    )
+                                Text("Stop")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        .disabled(!speechViewModel.hasCameraPermissions)
+                    } else {
+                        Button(action: {
+                            showingResult = false
+                            resultViewModel.reset()
+                            prompterViewModel.resetHighlighting()
+                            speechViewModel.startRecording {
+                                prompterViewModel.startHighlighting()
+                            }
+                            showingVideoPlayer = false
+                            speechViewModel.transcriptionText = ""
+                            speechViewModel.transcriptionError = nil
+                            speechViewModel.emotionResults = []
+                        }) {
+                            VStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 100, height: 100)
+                                    .overlay(
+                                        Image(systemName: "record.circle")
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 32))
+                                    )
+                                Text("Record")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        .disabled(!speechViewModel.hasCameraPermissions)
+                    }
+                }
+            }
+            .padding()
+            
 
             if !speechViewModel.recordedVideos.isEmpty && !speechViewModel.isRecording {
                 VStack(alignment: .leading) {
@@ -261,8 +370,8 @@ struct SpeechView: View {
                             ForEach(speechViewModel.recordedVideos, id: \.self) { url in
                                 HStack {
                                     VStack(alignment: .leading) {
-                                        let index = speechViewModel.recordedVideos.firstIndex(of: url) ?? -1
-                                        Text("Recording \(speechViewModel.recordedVideos.count - index)")
+                                        // Display custom title instead of "Recording X"
+                                        Text(speechViewModel.getRecordingTitle(for: url))
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                         Text(formatDate(from: url))
@@ -391,6 +500,16 @@ struct SpeechView: View {
                     expectedText: prompterViewModel.prompter.script,
                     emotionResults: speechViewModel.emotionResults
                 )
+                
+                // Save the score for the current recording
+                if let currentURL = speechViewModel.lastRecordedVideoURL {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if let score = resultViewModel.result?.score {
+                            speechViewModel.setRecordingScore(score, for: currentURL)
+                        }
+                    }
+                }
+                
                 if !showingResult && speechViewModel.lastRecordedVideoURL != nil { 
                     showingResult = true
                 }
@@ -404,6 +523,16 @@ struct SpeechView: View {
                     expectedText: prompterViewModel.prompter.script,
                     emotionResults: speechViewModel.emotionResults
                 )
+                
+                // Save the score for the current recording
+                if let currentURL = speechViewModel.lastRecordedVideoURL {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if let score = resultViewModel.result?.score {
+                            speechViewModel.setRecordingScore(score, for: currentURL)
+                        }
+                    }
+                }
+                
                 if !showingResult && speechViewModel.lastRecordedVideoURL != nil { 
                     showingResult = true
                 }
@@ -591,7 +720,7 @@ struct CameraPreview: NSViewRepresentable {
         return view
     }
 
-    func updateNSView(_ nsView: NSView, context: Context) {
+    func updateNSView(_ nsView: NSView, context: Context) -> Void {
         if let layer = nsView.layer as? AVCaptureVideoPreviewLayer {
             layer.session = session
 
