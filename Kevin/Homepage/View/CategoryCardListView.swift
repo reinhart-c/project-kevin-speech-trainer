@@ -14,6 +14,7 @@ struct CategoryCardListView: View {
     @Binding var path: NavigationPath
     @State private var presentedCategory: Category?
     @State private var selectedCategory: Category?
+    @State private var practiceTitle: String = ""
     
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -41,8 +42,14 @@ struct CategoryCardListView: View {
             }
         }
         .sheet(item: $presentedCategory) { category in
-            CategoryModalView(category: category) {
+            CategoryModalView(category: category) { title in
+                practiceTitle = title
                 path.append("SpeechView")
+            }
+        }
+        .navigationDestination(for: String.self) { destination in
+            if destination == "SpeechView" {
+                SpeechView(practiceTitle: practiceTitle)
             }
         }
     }

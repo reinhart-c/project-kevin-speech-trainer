@@ -39,6 +39,12 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
     @Published var emotionResults: [VoiceEmotionClassifierOutput] = []
     @Published var isAnalyzingEmotion = false
     
+    // Add these properties for recording titles and scores
+    @Published var recordingTitles: [URL: String] = [:]
+    @Published var recordingScores: [URL: Int] = [:]
+    
+    var currentPracticeTitle: String = "Untitled Practice"
+    
     override init() {
         super.init()
         loadRecordings() // Load existing recordings on init
@@ -212,6 +218,10 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
                 print("Recording saved to: \(outputFileURL)")
                 self.lastRecordedVideoURL = outputFileURL
                 self.recordedVideos.append(outputFileURL)
+                
+                // Set the recording title when the recording is finished
+                self.setRecordingTitle(self.currentPracticeTitle, for: outputFileURL)
+                
                 self.sortRecordings()
                 
                 // Start both transcription and emotion detection
@@ -219,6 +229,12 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
                 self.detectEmotion(url: outputFileURL)
             }
         }
+    }
+    
+    // Add method to start recording with title
+    func startRecordingWithTitle(_ title: String, onCountdownFinished: @escaping () -> Void) {
+        currentPracticeTitle = title
+        startRecording(onCountdownFinished: onCountdownFinished)
     }
     
     // MARK: - File Management
@@ -255,6 +271,8 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
         do {
             try FileManager.default.removeItem(at: url)
             recordedVideos.removeAll { $0 == url }
+            recordingTitles.removeValue(forKey: url)
+            recordingScores.removeValue(forKey: url)
             if lastRecordedVideoURL == url {
                 lastRecordedVideoURL = recordedVideos.first // newest if sorted
             }
@@ -273,6 +291,8 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
             }
         }
         recordedVideos.removeAll()
+        recordingTitles.removeAll()
+        recordingScores.removeAll()
         lastRecordedVideoURL = nil
     }
     
@@ -486,5 +506,25 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
             }
         }
         
+    }
+    
+    // Add this method to get recording title
+    func getRecordingTitle(for url: URL) -> String {
+        return recordingTitles[url] ?? "Untitled Recording"
+    }
+    
+    // Add this method to set recording score
+    func setRecordingScore(_ score: Int, for url: URL) {
+        recordingScores[url] = score
+    }
+    
+    // Add this method to get recording score
+    func getRecordingScore(for url: URL) -> Int? {
+        return recordingScores[url]
+    }
+    
+    // Add this method to set recording title
+    func setRecordingTitle(_ title: String, for url: URL) {
+        recordingTitles[url] = title
     }
 }

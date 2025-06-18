@@ -58,9 +58,9 @@ struct HomeView: View {
                         ScrollView {
                             LazyVStack {
                                 ForEach(speechViewModel.recordedVideos, id: \.self) { url in
-                                    let index = speechViewModel.recordedVideos.firstIndex(of: url) ?? -1
-                                    let recordingTitle = "Recording \(speechViewModel.recordedVideos.count - index)"
-                                    ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
+                                    let recordingTitle = speechViewModel.getRecordingTitle(for: url)
+                                    let score = speechViewModel.getRecordingScore(for: url) ?? 0
+                                    ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: score, tag: "test")
                                 }
                             }
                         }
