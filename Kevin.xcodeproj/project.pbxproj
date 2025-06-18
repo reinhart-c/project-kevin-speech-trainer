@@ -30,6 +30,7 @@
 		CBC32DD52DF80DDD007B00B1 /* Kevin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kevin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBDC3CDD2DF984750051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBDC3D092DFAB4A00051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
+		CBF56FEC2E02A7A200F13383 /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -89,6 +90,11 @@
 			sourceTree = "<group>";
 		};
 		CBDC3D0C2DFAB4A00051B96A /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CBF56FF02E02A7A200F13383 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -171,6 +177,10 @@
 				{
 					ProductGroup = CB6F70EA2E01464F00359D05 /* Products */;
 					ProjectRef = CB6F70E62E01464F00359D05 /* Kevin.xcodeproj */;
+				},
+				{
+					ProductGroup = CBF56FF02E02A7A200F13383 /* Products */;
+					ProjectRef = CBF56FEC2E02A7A200F13383 /* Kevin.xcodeproj */;
 				},
 			);
 			projectRoot = "";
