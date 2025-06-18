@@ -20,13 +20,12 @@ struct OnboardingView: View {
                         onReady()
                     }) {
                         Image(systemName: "xmark")
-                            .foregroundColor(.gray)
-                            .frame(width: 24, height: 24)
-                            .padding()
+                            .resizable()
+                            .foregroundColor(.black)
+                            .frame(width: 18, height: 18)
                     }
                     .buttonStyle(.plain)
-                    .frame(width: 52, height: 52)
-                }.padding(.top)
+                }.padding(.top, 32)
                 // Main content
                 ZStack {
                     ForEach(Array(viewModel.onboardingItems.enumerated()), id: \.element.id) { index, item in
@@ -108,10 +107,10 @@ struct OnboardingView: View {
                         }
                     }
                 }
-                .frame(width: 552)
+               
+            }.frame(width: 500)
+            .padding(.bottom, 40)
                 .padding(.horizontal, 40)
-                .padding(.bottom, 40)
-            }
         }
     }
 }
