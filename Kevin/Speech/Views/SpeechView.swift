@@ -324,7 +324,7 @@ struct SpeechView: View {
                 showingResult = true
             }
         }
-        .onChange(of: speechViewModel.lastRecordedVideoURL) { oldValue, newValue in
+        .onChange(of: speechViewModel.lastRecordedVideoURL) { _, newValue in
             if newValue != nil && !speechViewModel.isRecording {
                 if !showingVideoPlayer { 
                     showingVideoPlayer = true
@@ -362,7 +362,7 @@ struct SpeechView: View {
                 }
             }
         }
-        .onChange(of: speechViewModel.isAnalyzingEmotion) { oldValue, newValue in
+        .onChange(of: speechViewModel.isAnalyzingEmotion) { _, newValue in
             if !newValue && !speechViewModel.isTranscribing && !speechViewModel.isRecording {
                 print("🎯 Both transcription and emotion analysis finished. Calculating score.")
                 resultViewModel.calculateScore(
@@ -504,9 +504,11 @@ struct TranscriptionView: View {
                                 Text("Ready to transcribe")
                                     .font(.title2)
                                     .fontWeight(.medium)
+                                 
+                                 let noVideoText = "Tap 'Retry Transcription' to convert the audio from your recording to text, or it will start automatically if triggered from the main view."
 
                                 if videoURL != nil {
-                                     Text("Tap 'Retry Transcription' to convert the audio from your recording to text, or it will start automatically if triggered from the main view.")
+                                    Text(noVideoText)
                                         .font(.body)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.center)

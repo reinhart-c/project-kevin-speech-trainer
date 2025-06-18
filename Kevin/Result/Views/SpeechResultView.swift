@@ -14,14 +14,14 @@ struct SpeechResultView: View {
         VStack {
             
             HStack {
-                VStack (alignment: .leading){
-                    Text("This is my first time to present product") //title
+                VStack(alignment: .leading) {
+                    Text("This is my first time to present product") // title
                         .foregroundStyle(Color.primary)
                         .font(.system(size: 30, weight: .semibold))
                         .padding(.top, 40)
                     
-                    HStack{
-                        Text("12 March 2024") //date
+                    HStack {
+                        Text("12 March 2024") // date
                             .foregroundStyle(Color.gray)
                             .font(.system(size: 20))
                     
@@ -29,15 +29,15 @@ struct SpeechResultView: View {
                             .foregroundStyle(Color.lightGrey)
                             .frame(width: 5, height: 5)
                         
-                        //image icon category
+                        // image icon category
                                                    
-                        Text("Product") //tag category
+                        Text("Product") // tag category
                             .font(.system(size: 20))
                     }
                 }
                 Spacer()
                                    
-                Button{
+                Button {
                    
                 } label: {
                     Text("Back to home")
@@ -52,7 +52,7 @@ struct SpeechResultView: View {
             }
             HStack {
                 Rectangle()
-               //ResultView() //score and emotion
+               // ResultView() // score and emotion
             }
             .padding([.leading, .trailing], 40)
             .background(Color.lightBlue)

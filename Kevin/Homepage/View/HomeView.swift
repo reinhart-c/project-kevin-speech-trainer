@@ -57,7 +57,8 @@ struct HomeView: View {
                             ForEach(speechViewModel.recordedVideos, id: \.self) { url in
                                 let index = speechViewModel.recordedVideos.firstIndex(of: url) ?? -1
                                 let recordingTitle = "Recording \(speechViewModel.recordedVideos.count - index)"
-                                ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
+                                let date = formatDate(from: url)
+                                ProgressItem(title: recordingTitle, date: date, categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
                             }
                         }
                     }
