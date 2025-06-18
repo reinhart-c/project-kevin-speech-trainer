@@ -60,13 +60,11 @@ struct HomeView: View {
                             SearchBarView()
                                 .padding(.trailing, 40)
                         }
-                        ScrollView {
-                            LazyVStack {
-                                ForEach(speechViewModel.recordedVideos, id: \.self) { url in
-                                    let recordingTitle = speechViewModel.getRecordingTitle(for: url)
-                                    let score = speechViewModel.getRecordingScore(for: url) ?? 0
-                                    ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: score, tag: "test")
-                                }
+                        LazyVStack {
+                            ForEach(speechViewModel.recordedVideos, id: \.self) { url in
+                                let recordingTitle = speechViewModel.getRecordingTitle(for: url)
+                                let score = speechViewModel.getRecordingScore(for: url) ?? 0
+                                ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: score, tag: "test")
                             }
                         }
                     }
