@@ -11,12 +11,14 @@ struct OnboardingPageView: View {
     let item: Onboarding
     
     var body: some View {
-        VStack(spacing: 30) {
-            // Image placeholder - replace with your actual images
-            Image(systemName: getSystemIcon(for: item.image))
-                .font(.system(size: 120))
+        VStack(spacing: 0) {
+            Spacer()
+            Image(item.image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .font(.system(size: 60))
                 .foregroundColor(.black.opacity(0.7))
-                .frame(height: 200)
+                .frame( width: 150)
             
             VStack(spacing: 15) {
                 Text(item.title)
@@ -28,25 +30,7 @@ struct OnboardingPageView: View {
                     .font(.body)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-            }
-        }
-        .padding()
-    }
-    
-    // Helper function to map your image names to system icons
-    private func getSystemIcon(for imageName: String) -> String {
-        switch imageName {
-        case "onboarding1":
-            return "location.circle"
-        case "onboarding2":
-            return "headphones.circle"
-        case "onboarding3":
-            return "video.circle"
-        case "onboarding4":
-            return "chart.bar.doc.horizontal"
-        default:
-            return "circle"
+            }.padding(.bottom, 30)
         }
     }
 }

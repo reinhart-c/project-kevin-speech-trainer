@@ -50,5 +50,9 @@ class OnboardingViewModel: ObservableObject {
             currentPage -= 1
         }
     }
+    func skipOnboarding() {
+        //handled in view
+        //currentPage = onboardingItems.count - 1
+    }
 }
 
