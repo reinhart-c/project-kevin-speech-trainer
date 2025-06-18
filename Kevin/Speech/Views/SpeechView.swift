@@ -217,7 +217,18 @@ struct SpeechView: View {
                         isVideoPlaying = false
                     }
                 } else {
-                    PrompterView(viewModel: prompterViewModel)
+                    PrompterView(viewModel: prompterViewModel) {
+                        showingResult = false
+                        resultViewModel.reset()
+                        prompterViewModel.resetHighlighting()
+                        speechViewModel.startRecording {
+                            prompterViewModel.startHighlighting()
+                        }
+                        showingVideoPlayer = false
+                        speechViewModel.transcriptionText = ""
+                        speechViewModel.transcriptionError = nil
+                        speechViewModel.emotionResults = []
+                    }
                 }
             }
             .padding(.horizontal)

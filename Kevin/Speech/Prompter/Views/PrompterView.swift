@@ -13,6 +13,8 @@ struct PrompterView: View {
     @State private var showingResult = false
     @State private var showingVideoPlayer = false
     
+    let onStartRecording: () -> Void
+    
     var body: some View {
         VStack(alignment: .leading) {
             ZStack {
@@ -35,12 +37,11 @@ struct PrompterView: View {
                                     .font(.system(size: 15))
                                     .multilineTextAlignment(.center)
                                 
-                                // Always show Record button when not recording and in camera mode
                                 Button{
                                     showingResult = false
                                     viewModel.resetHighlighting()
-                                    // Note: Recording start should be handled by parent view
                                     showingVideoPlayer = false
+                                    onStartRecording()
                                 } label:{
                                     Text("Start Now")
                                         .foregroundColor(.white)
@@ -97,6 +98,7 @@ struct PrompterView: View {
 
 struct PrompterView_Previews: PreviewProvider {
     static var previews: some View {
-        PrompterView(viewModel: PrompterViewModel(script: "Preview script with a few words to see highlighting."))
+        PrompterView(viewModel: PrompterViewModel(script: "Preview script with a few words to see highlighting.")) {
+        }
     }
 }
