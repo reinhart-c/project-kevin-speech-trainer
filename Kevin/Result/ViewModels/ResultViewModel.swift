@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftUI
 
-class ResultViewModel: ObservableObject {
+internal class ResultViewModel: ObservableObject {
     @Published var result: Result?
     @Published var isCalculating: Bool = false
 
