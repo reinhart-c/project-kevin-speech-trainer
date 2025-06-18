@@ -24,6 +24,9 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     @Published var recordingTitles: [URL: String] = [:]
     @Published var currentRecordingTitle: String = ""
     
+    // Add this to the published properties section (around line 26):
+    @Published var recordingScores: [URL: Int] = [:]
+    
     // MARK: - Published Properties from SpeechRecognizer
     @Published var transcriptionText = ""
     @Published var isTranscribing = false
@@ -47,6 +50,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
         super.init()
         loadRecordings() // Load existing recordings on init
         loadRecordingTitles()
+        loadRecordingScores()
     }
 
     // MARK: - Camera Setup and Permissions
@@ -265,10 +269,12 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             try FileManager.default.removeItem(at: url)
             recordedVideos.removeAll { $0 == url }
             recordingTitles.removeValue(forKey: url) // Also remove the title
+            recordingScores.removeValue(forKey: url) // Also remove the score
             if lastRecordedVideoURL == url {
                 lastRecordedVideoURL = recordedVideos.first // newest if sorted
             }
             saveRecordingTitles() // Save after deletion
+            saveRecordingScores() // Save after deletion
             print("Successfully deleted recording: \(url)")
         } catch {
             print("Error deleting recording \(url): \(error.localizedDescription)")
@@ -285,8 +291,10 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
         }
         recordedVideos.removeAll()
         recordingTitles.removeAll() // Clear all titles
+        recordingScores.removeAll() // Clear all scores
         lastRecordedVideoURL = nil
         saveRecordingTitles() // Save after clearing
+        saveRecordingScores() // Save after clearing
     }
 
     // MARK: - Speech Recognition
@@ -519,6 +527,33 @@ class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     private func loadRecordingTitles() {
         if let titlesData = UserDefaults.standard.dictionary(forKey: "recordingTitles") as? [String: String] {
             recordingTitles = Dictionary(uniqueKeysWithValues: titlesData.compactMap { key, value in
+                guard let url = URL(string: key) else { return nil }
+                return (url, value)
+            })
+        }
+    }
+
+    // MARK: - Recording Score Management
+    func setRecordingScore(_ score: Int, for url: URL) {
+        recordingScores[url] = score
+        saveRecordingScores()
+    }
+
+    func getRecordingScore(for url: URL) -> Int {
+        return recordingScores[url] ?? 0
+    }
+
+    // MARK: - Recording Score Persistence
+    private func saveRecordingScores() {
+        let scoresData = recordingScores.mapValues { $0 }.reduce(into: [String: Int]()) { result, pair in
+            result[pair.key.absoluteString] = pair.value
+        }
+        UserDefaults.standard.set(scoresData, forKey: "recordingScores")
+    }
+
+    private func loadRecordingScores() {
+        if let scoresData = UserDefaults.standard.dictionary(forKey: "recordingScores") as? [String: Int] {
+            recordingScores = Dictionary(uniqueKeysWithValues: scoresData.compactMap { key, value in
                 guard let url = URL(string: key) else { return nil }
                 return (url, value)
             })

@@ -58,7 +58,8 @@ struct HomeView: View {
                         LazyVStack {
                             ForEach(speechViewModel.recordedVideos, id: \.self) { url in
                                 let recordingTitle = speechViewModel.getRecordingTitle(for: url)
-                                ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
+                                let recordingScore = speechViewModel.getRecordingScore(for: url)
+                                ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: recordingScore, tag: "test")
                             }
                         }
                     }

@@ -353,6 +353,16 @@ struct SpeechView: View {
                     expectedText: prompterViewModel.prompter.script,
                     emotionResults: speechViewModel.emotionResults
                 )
+                
+                // Save the score for the current recording
+                if let currentURL = speechViewModel.lastRecordedVideoURL {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if let score = resultViewModel.result?.score {
+                            speechViewModel.setRecordingScore(score, for: currentURL)
+                        }
+                    }
+                }
+                
                 if !showingResult && speechViewModel.lastRecordedVideoURL != nil { 
                     showingResult = true
                 }
@@ -366,6 +376,16 @@ struct SpeechView: View {
                     expectedText: prompterViewModel.prompter.script,
                     emotionResults: speechViewModel.emotionResults
                 )
+                
+                // Save the score for the current recording
+                if let currentURL = speechViewModel.lastRecordedVideoURL {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if let score = resultViewModel.result?.score {
+                            speechViewModel.setRecordingScore(score, for: currentURL)
+                        }
+                    }
+                }
+                
                 if !showingResult && speechViewModel.lastRecordedVideoURL != nil { 
                     showingResult = true
                 }
