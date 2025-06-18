@@ -11,6 +11,7 @@ struct HomeView: View {
     @StateObject private var viewModel = CategoryViewModel()
     @StateObject private var speechViewModel = SpeechViewModel()
     @State private var path = NavigationPath()
+    
     var body: some View {
         ZStack {
             Color.white
@@ -20,7 +21,7 @@ struct HomeView: View {
                     VStack {
                         HStack {
                             (
-                                Text("**“Say It”**")
+                                Text("\"Say It\"")
                                     .foregroundStyle(
                                         LinearGradient(colors: [.purpleTitle, .blueTitle], startPoint: .leading, endPoint: .trailing))
                                 
@@ -68,11 +69,6 @@ struct HomeView: View {
                     .padding()
                 }.onAppear {
                     speechViewModel.loadRecordings()
-                }
-                .navigationDestination(for: String.self) { val in
-                    if val == "SpeechView" {
-                        SpeechView()
-                    }
                 }
             }
         }

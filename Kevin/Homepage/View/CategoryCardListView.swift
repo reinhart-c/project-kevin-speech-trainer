@@ -6,6 +6,11 @@
 //
 import SwiftUI
 
+// Add this custom navigation destination type
+struct SpeechDestination: Hashable {
+    let practiceTitle: String
+}
+
 struct CategoryCardListView: View {
     @State private var showOnboarding = true
     @State private var onboardingCompleted = false
@@ -44,13 +49,11 @@ struct CategoryCardListView: View {
         .sheet(item: $presentedCategory) { category in
             CategoryModalView(category: category) { title in
                 practiceTitle = title
-                path.append("SpeechView")
+                path.append(SpeechDestination(practiceTitle: title))
             }
         }
-        .navigationDestination(for: String.self) { destination in
-            if destination == "SpeechView" {
-                SpeechView(practiceTitle: practiceTitle)
-            }
+        .navigationDestination(for: SpeechDestination.self) { destination in
+            SpeechView(practiceTitle: destination.practiceTitle)
         }
     }
     
@@ -64,6 +67,7 @@ struct CategoryCardListView: View {
         }
     }
 }
+
 #Preview {
 //    CategoryCardListView()
 }
