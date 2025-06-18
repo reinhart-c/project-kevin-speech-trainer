@@ -27,11 +27,13 @@ struct SpeechView: View {
     @State private var dontAskAgain = false
     
     let practiceTitle: String
+    let preselectedVideoURL: URL? // Add this for opening specific recordings
 
-    init(practiceTitle: String = "Untitled Practice", speechViewModel: SpeechViewModel = SpeechViewModel(), path: Binding<NavigationPath> = .constant(NavigationPath())) {
+    init(practiceTitle: String = "Untitled Practice", speechViewModel: SpeechViewModel = SpeechViewModel(), path: Binding<NavigationPath> = .constant(NavigationPath()), preselectedVideoURL: URL? = nil) {
         self.practiceTitle = practiceTitle
         self.speechViewModel = speechViewModel
         self._path = path
+        self.preselectedVideoURL = preselectedVideoURL
     }
 
     var body: some View {
@@ -40,7 +42,6 @@ struct SpeechView: View {
             mainContentView
             statusText
             controlButtonsView
-            recordingListView
             Spacer()
         }
         .sheet(item: $confirmationAction) { action in
@@ -332,27 +333,23 @@ struct SpeechView: View {
         .disabled(!speechViewModel.hasCameraPermissions)
     }
     
-    @ViewBuilder
-    private var recordingListView: some View {
-        if !speechViewModel.recordedVideos.isEmpty && !speechViewModel.isRecording {
-            RecordingListView(
-                speechViewModel: speechViewModel,
-                showingVideoPlayer: $showingVideoPlayer,
-                showingResult: $showingResult,
-                videoPlayer: $videoPlayer,
-                isVideoPlaying: $isVideoPlaying,
-                selectedVideoForTranscription: $selectedVideoForTranscription,
-                showingTranscriptionView: $showingTranscriptionView
-            )
-        }
-    }
-    
     // MARK: - Helper Methods
     
     private func setupView() {
         speechViewModel.setupCamera()
         speechViewModel.loadRecordings()
         speechViewModel.currentPracticeTitle = practiceTitle
+        
+        // Handle preselected video URL if provided
+        if let preselectedURL = preselectedVideoURL {
+            speechViewModel.lastRecordedVideoURL = preselectedURL
+            showingVideoPlayer = true
+            videoPlayer = AVPlayer(url: preselectedURL)
+            isVideoPlaying = false
+            
+            speechViewModel.transcribeVideo(url: preselectedURL)
+            speechViewModel.detectEmotion(url: preselectedURL)
+        }
     }
     
     private func cleanupView() {
