@@ -30,19 +30,18 @@ struct PrompterView: View {
                                     .foregroundStyle(.gray)
                                     .font(.system(size: 20, weight: .semibold))
                                 
-                                
                                 Text("\n\n\nMake sure your body language is visible. Take a breath, and show your best self")
                                     .padding()
                                     .foregroundStyle(.gray)
                                     .font(.system(size: 15))
                                     .multilineTextAlignment(.center)
                                 
-                                Button{
+                                Button {
                                     showingResult = false
                                     viewModel.resetHighlighting()
                                     showingVideoPlayer = false
                                     onStartRecording()
-                                } label:{
+                                } label: {
                                     Text("Start Now")
                                         .foregroundColor(.white)
                                         .padding(.horizontal, 30)
@@ -53,13 +52,12 @@ struct PrompterView: View {
                                 .padding(.top, 200)
                                 .buttonStyle(PlainButtonStyle())
                                 
-                            }
-                            else{
+                            } else {
                                 viewModel.words.enumerated().reduce(Text("")) { (accumulatedText, pair) in
                                     let (index, word) = pair
                                     return accumulatedText +
                                     Text(word + " ")
-                                        .font(.system(size:19, weight: .medium))
+                                        .font(.system(size: 19, weight: .medium))
                                         .foregroundColor(index == viewModel.currentWordIndex ? Color.accentColor : Color.primary) // Highlight current word
                                 }
                                 .padding()

@@ -330,7 +330,7 @@ struct SpeechView: View {
                     } else if action == .retry {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
-                        speechViewModel.startRecording{}
+                        speechViewModel.startRecording {}
                     }
                     confirmationAction = nil
                 },
