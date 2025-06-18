@@ -100,22 +100,17 @@ struct EmotionRadarView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            // Dominant Emotion Display
             VStack(spacing: 8) {
                 Text("How was your tone of voice?")
                     .font(.title2)
                     .fontWeight(.medium)
                     .foregroundColor(.secondary)
-
-                // Dominant Emotion Card
                 HStack {
                     Text("Dominant Vibe")
                         .font(.title3)
                         .fontWeight(.medium)
                         .foregroundColor(.secondary)
-
                     Spacer()
-
                     Text(getDominantEmotion().emotion)
                         .font(.largeTitle)
                         .fontWeight(.bold)
@@ -223,7 +218,6 @@ struct EmotionRadarView: View {
                 // Enhanced Data Polygons with multiple gradient layers
                 ForEach(0..<data.count, id: \.self) { jidx in
                     let path = createDataPath(for: jidx)
-
                     ZStack {
                         // Outer glow effect
                         path
@@ -280,7 +274,6 @@ struct EmotionRadarView: View {
                         let size = ((width - (50 + labelWidth))/2) * (CGFloat(dataPointVal)/CGFloat(thisDimension.maxVal))
                         let xCoor = size * cos(angle)
                         let yCoor = size * sin(angle)
-
                         ZStack {
                             // Glow effect
                             Circle()
@@ -331,12 +324,10 @@ struct EmotionRadarView: View {
         guard let dataPoint = data.first else {
             return ("Neutral", 0.0)
         }
-
         let sortedEntries = dataPoint.entries.sorted { $0.value > $1.value }
         guard let dominantEntry = sortedEntries.first else {
             return ("Neutral", 0.0)
         }
-
         return (dominantEntry.emotionCase.rawValue, dominantEntry.value)
     }
 
@@ -350,7 +341,6 @@ struct EmotionRadarView: View {
                 let size = ((width - (50 + labelWidth))/2) * (CGFloat(dataPointVal)/CGFloat(maxVal))
                 let xCoor = size * cos(angle)
                 let yCoor = size * sin(angle)
-
                 if idx == 0 {
                     path.move(to: CGPoint(x: center.x + xCoor, y: center.y + yCoor))
                 } else {
@@ -361,10 +351,8 @@ struct EmotionRadarView: View {
     }
 
     private func getDataPointValue(for emotionCase: EmotionCase, in dataPoint: EmotionDataPoint) -> Double {
-        for entry in dataPoint.entries {
-            if emotionCase == entry.emotionCase {
+        for entry in dataPoint.entries where emotionCase == entry.emotionCase {
                 return entry.value
-            }
         }
         return 0
     }

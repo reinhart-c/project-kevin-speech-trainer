@@ -43,7 +43,7 @@ struct CategoryCardView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Spacer()
-                //title & subtitle
+                // title & subtitle
                 Text(category.title)
                     .font(.system(size: 24, weight: .medium))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -63,12 +63,10 @@ struct CategoryCardView: View {
                 if category.tag == "Product" {
                     Text("Product")
                         .font(.system(size: 20))
-                }
-                else if category.tag == "Political" {
+                } else if category.tag == "Political" {
                     Text("Political")
                         .font(.system(size: 20))
-                }
-                else{
+                } else {
                     Text("Social Advocacy")
                         .font(.system(size: 20))
                 }

@@ -70,8 +70,8 @@ struct Result {
         guard !expectedWords.isEmpty, !transcribedWords.isEmpty else { return 0 }
         
         // build counts
-        let expCounts = expectedWords.reduce(into: [String:Int]()) { $0[$1, default:0] += 1 }
-        let transCounts = transcribedWords.reduce(into: [String:Int]()) { $0[$1, default:0] += 1 }
+        let expCounts = expectedWords.reduce(into: [String: Int]()) { $0[$1, default: 0] += 1 }
+        let transCounts = transcribedWords.reduce(into: [String: Int]()) { $0[$1, default: 0] += 1 }
         
         // true matched = sum of min counts per word
         let matched = expCounts.reduce(0) { sum, pair in
@@ -82,11 +82,11 @@ struct Result {
         let precision = Double(matched) / Double(transcribedWords.count)
         let recall    = Double(matched) / Double(expectedWords.count)
         
-        let f1 = (precision + recall) > 0
+        let f1Score = (precision + recall) > 0
         ? 2 * (precision * recall) / (precision + recall)
         : 0
         
-        return Int((f1 * 100).rounded())
+        return Int((f1Score * 100).rounded())
     }
 
     private static func processEmotionResults(_ results: [VoiceEmotionClassifierOutput]) -> (String?, Double?, [String: Double]?) {

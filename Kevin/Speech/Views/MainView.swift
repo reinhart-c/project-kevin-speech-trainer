@@ -29,7 +29,7 @@ struct MainView: View {
                     if dontAskAgain {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
-                        speechViewModel.startRecording{}
+                        speechViewModel.startRecording {}
                     } else {
                         confirmationAction = .retry
                         showConfirmationModal = true
@@ -45,9 +45,9 @@ struct MainView: View {
                 .buttonStyle(PlainButtonStyle())
                 .padding(.trailing, 10)
                 
-                //end
+                // end
                 Button {
-                    //endSession
+                    // endSession
                     if dontAskAgain {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
@@ -85,7 +85,7 @@ struct MainView: View {
                     } else if action == .retry {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
-                        speechViewModel.startRecording{}
+                        speechViewModel.startRecording {}
                     }
                     confirmationAction = nil
                 },

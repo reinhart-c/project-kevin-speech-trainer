@@ -26,7 +26,7 @@ struct ProgressBar: View {
             Spacer()
                 .frame(width: 15)
             
-            HStack{
+            HStack {
                 ZStack(alignment: .leading) {
                     Capsule()
                         .fill(Color.pinkBarEmpty)
