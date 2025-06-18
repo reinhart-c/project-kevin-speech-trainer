@@ -7,6 +7,8 @@
 import SwiftUI
 
 struct CategoryCardListView: View {
+    @State private var showOnboarding = true
+
     @StateObject private var viewModel = CategoryViewModel()
     @Binding var path: NavigationPath
     @State private var presentedCategory: Category? = nil
@@ -30,6 +32,11 @@ struct CategoryCardListView: View {
                 }
         }
         .padding()
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingView {
+                print("Onboarding completed!")
+            }
+        }
         .sheet(item: $presentedCategory) { category in
             CategoryModalView(category: category) {
                 path.append("SpeechView")
