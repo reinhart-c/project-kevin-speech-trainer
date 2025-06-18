@@ -52,7 +52,7 @@ struct CategoryCardListView: View {
             }
         }
         .navigationDestination(for: SpeechDestination.self) { destination in
-            SpeechView(practiceTitle: destination.practiceTitle, speechViewModel: SpeechViewModelStore.shared.speechViewModel)
+            SpeechView(practiceTitle: destination.practiceTitle, speechViewModel: SpeechViewModelStore.shared.speechViewModel, path: $path)
         }
     }
     

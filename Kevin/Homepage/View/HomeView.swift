@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var viewModel = CategoryViewModel()
-    @StateObject private var speechViewModelStore = SpeechViewModelStore.shared
+    @ObservedObject private var speechViewModelStore = SpeechViewModelStore.shared
     @State private var path = NavigationPath()
     
     private var speechViewModel: SpeechViewModel {
@@ -69,8 +68,14 @@ struct HomeView: View {
                         }
                     }
                     .padding()
-                }.onAppear {
+                }
+                .onAppear {
                     speechViewModel.loadRecordings()
+                }
+                .refreshable {
+                    speechViewModel.loadRecordings()
+                }
+                .onChange(of: speechViewModel.recordedVideos) { _, _ in
                 }
             }
         }

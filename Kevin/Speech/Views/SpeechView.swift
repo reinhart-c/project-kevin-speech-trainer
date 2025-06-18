@@ -13,6 +13,7 @@ struct SpeechView: View {
     @ObservedObject var speechViewModel: SpeechViewModel
     @StateObject private var prompterViewModel = PrompterViewModel()
     @StateObject private var resultViewModel = ResultViewModel()
+    @Binding var path: NavigationPath
 
     @State private var showingVideoPlayer = false
     @State private var showingTranscriptionView = false
@@ -27,9 +28,10 @@ struct SpeechView: View {
     
     let practiceTitle: String
 
-    init(practiceTitle: String = "Untitled Practice", speechViewModel: SpeechViewModel = SpeechViewModel()) {
+    init(practiceTitle: String = "Untitled Practice", speechViewModel: SpeechViewModel = SpeechViewModel(), path: Binding<NavigationPath> = .constant(NavigationPath())) {
         self.practiceTitle = practiceTitle
         self.speechViewModel = speechViewModel
+        self._path = path
     }
 
     var body: some View {
@@ -157,7 +159,7 @@ struct SpeechView: View {
     
     private var backToHomeButton: some View {
         Button {
-            // Back to home action
+            path.removeLast()
         } label: {
             Text("Back to Home")
                 .font(.system(size: 15))
@@ -357,6 +359,10 @@ struct SpeechView: View {
         speechViewModel.stopSession()
         prompterViewModel.stopHighlighting()
         videoPlayer?.pause()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            speechViewModel.loadRecordings()
+        }
     }
     
     private func toggleVideoPlayback() {
