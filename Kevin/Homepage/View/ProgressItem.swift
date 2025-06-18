@@ -73,7 +73,7 @@ struct ProgressItem: View {
                 .frame(width: 100)
 
             Image(systemName: "chevron.right")
-                .foregroundStyle(Color.darkGray)
+                .foregroundStyle(Color.customDarkGray)
                 .font(.system(size: 30))
         }
         .padding()
