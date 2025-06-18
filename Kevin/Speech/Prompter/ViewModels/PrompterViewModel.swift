@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftUI // For Timer and Color, though Timer is Foundation
 
-class PrompterViewModel: ObservableObject {
+internal class PrompterViewModel: ObservableObject {
     @Published var prompter: Prompter
     @Published var words: [String] = []
     @Published var currentWordIndex: Int = -1

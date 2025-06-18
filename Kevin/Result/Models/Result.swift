@@ -7,6 +7,18 @@
 
 import Foundation
 
+struct EmotionResultData {
+    let dominantEmotionKey: String?
+    let dominantEmotionValue: Double?
+    let emotionAverage: [String: Double]?
+    
+    init(_ dominantEmotionKey: String?, _ dominantEmotionValue: Double?, _ emotionAverage: [String: Double]?) {
+        self.dominantEmotionKey = dominantEmotionKey
+        self.dominantEmotionValue = dominantEmotionValue
+        self.emotionAverage = emotionAverage
+    }
+}
+
 struct Result {
     let score: Int
     let transcribedText: String
@@ -44,7 +56,8 @@ struct Result {
 
         // Process emotion results
         if let emotionResults = emotionResults, !emotionResults.isEmpty {
-            let (dominant, percentage, breakdown) = Self.processEmotionResults(emotionResults)
+            let emoData = Self.processEmotionResults(emotionResults)
+            let (dominant, percentage, breakdown) = (emoData.dominantEmotionKey, emoData.dominantEmotionValue, emoData.emotionAverage)
             self.dominantEmotion = dominant
             self.dominantEmotionPercentage = percentage
             self.emotionBreakdown = breakdown
@@ -70,8 +83,8 @@ struct Result {
         guard !expectedWords.isEmpty, !transcribedWords.isEmpty else { return 0 }
         
         // build counts
-        let expCounts = expectedWords.reduce(into: [String:Int]()) { $0[$1, default:0] += 1 }
-        let transCounts = transcribedWords.reduce(into: [String:Int]()) { $0[$1, default:0] += 1 }
+        let expCounts = expectedWords.reduce(into: [String: Int]()) { $0[$1, default: 0] += 1 }
+        let transCounts = transcribedWords.reduce(into: [String: Int]()) { $0[$1, default: 0] += 1 }
         
         // true matched = sum of min counts per word
         let matched = expCounts.reduce(0) { sum, pair in
@@ -82,15 +95,15 @@ struct Result {
         let precision = Double(matched) / Double(transcribedWords.count)
         let recall    = Double(matched) / Double(expectedWords.count)
         
-        let f1 = (precision + recall) > 0
+        let f1Score = (precision + recall) > 0
         ? 2 * (precision * recall) / (precision + recall)
         : 0
         
-        return Int((f1 * 100).rounded())
+        return Int((f1Score * 100).rounded())
     }
 
-    private static func processEmotionResults(_ results: [VoiceEmotionClassifierOutput]) -> (String?, Double?, [String: Double]?) {
-        guard !results.isEmpty else { return (nil, nil, nil) }
+    private static func processEmotionResults(_ results: [VoiceEmotionClassifierOutput]) -> EmotionResultData {
+        guard !results.isEmpty else { return EmotionResultData(nil, nil, nil) }
 
         // Aggregate probabilities across all predictions
         var emotionTotals: [String: Double] = [:]
@@ -113,10 +126,10 @@ struct Result {
         // Find dominant emotion
         let sortedEmotions = emotionAverages.sorted { $0.value > $1.value }
         guard let dominantEmotion = sortedEmotions.first else {
-            return (nil, nil, nil)
+            return EmotionResultData(nil, nil, nil)
         }
 
-        return (
+        return EmotionResultData(
             dominantEmotion.key,
             dominantEmotion.value * 100, // Convert to percentage
             emotionAverages.mapValues { $0 * 100 } // Convert all to percentages

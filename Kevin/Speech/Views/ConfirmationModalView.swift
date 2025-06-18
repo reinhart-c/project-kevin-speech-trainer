@@ -26,11 +26,11 @@ struct ConfirmationModalView: View {
                 .frame(width: 60, height: 60)
                 .foregroundColor(.yellow)
 
-            Text(actionType == .endSession ? "Are you sure?" : "Do you want to restart?")
+            Text(actionType == .endSession ? "Wanna leave already?" : "Wanna try again?")
                 .font(.title2.bold())
                 .foregroundColor(.black)
 
-            Text("The progress you’ve made will not be saved")
+            Text(actionType == .endSession ? "If you end session, the progress you’ve done will not be saved" : "This will reset your current session")
                 .foregroundColor(.gray)
 
             HStack {

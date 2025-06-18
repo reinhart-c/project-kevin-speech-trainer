@@ -133,6 +133,9 @@ struct HomeView: View {
                             }
                         }
                     }
+                    .padding()
+                }.onAppear {
+                    speechViewModel.loadRecordings()
                 }
                 .padding()
             }.onAppear {

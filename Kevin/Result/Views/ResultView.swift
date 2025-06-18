@@ -64,25 +64,25 @@ struct ResultView: View {
                                 .font(.headline)
                                 .fontWeight(.semibold)
 
-                            StatRow(
-                                title: "Words Matched",
-                                value: "\(result.matchedWords.count)",
-                                color: .green
-                            )
-
-                            if !result.extraWords.isEmpty {
-                                StatRow(
-                                    title: "Extra Words",
-                                    value: "\(result.extraWords.count)",
-                                    color: .orange
-                                )
-                            }
+//                            StatRow(
+//                                title: "Words Matched",
+//                                value: "\(result.matchedWords.count) times",
+//                                color: .pinkText
+//                            )
 
                             if !result.missedWords.isEmpty {
                                 StatRow(
                                     title: "Missed Words",
                                     value: "\(result.missedWords.count)",
-                                    color: .red
+                                    color: .pinkText
+                                )
+                            }
+                            
+                            if !result.extraWords.isEmpty {
+                                StatRow(
+                                    title: "Extra Words",
+                                    value: "\(result.extraWords.count) times",
+                                    color: .purpleText
                                 )
                             }
 
@@ -134,7 +134,7 @@ struct ResultView: View {
                                     DetailSection(
                                         title: "Extra Words:",
                                         words: result.extraWords,
-                                        color: .orange
+                                        color: .black
                                     )
                                 }
 
@@ -142,7 +142,7 @@ struct ResultView: View {
                                     DetailSection(
                                         title: "Missed Words:",
                                         words: result.missedWords,
-                                        color: .red
+                                        color: .black
                                     )
                                 }
                             }
@@ -208,10 +208,6 @@ struct StatRow: View {
 
     var body: some View {
         HStack {
-            Circle()
-                .fill(color)
-                .frame(width: 8, height: 8)
-
             Text(title)
                 .font(.body)
 
@@ -287,12 +283,12 @@ struct EmotionBar: View {
 
 #Preview {
     ResultView(viewModel: {
-        let vm = ResultViewModel()
-        vm.result = Result(
+        let rvm = ResultViewModel()
+        rvm.result = Result(
             transcribedText: "Hello world this is a test with some extra words",
             expectedText: "Hello world this is a test"
         )
-        return vm
+        return rvm
     }()) {
         print("Reset tapped")
     }

@@ -22,32 +22,31 @@ struct MainView: View {
                     .padding(.leading, 40)
 
                 Spacer()
-
+                
                 // retry
                 Button {
                     // retry session
                     if dontAskAgain {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
-                        speechViewModel.startRecording{}
+                        speechViewModel.startRecording {}
                     } else {
                         confirmationAction = .retry
                         showConfirmationModal = true
                     }
                 } label: {
-                    Text("Retry")
-                        .foregroundStyle(.white)
+                    Image(systemName: "arrow.trianglehead.clockwise")
+                        .foregroundStyle(.gray)
                         .font(.system(size: 20))
                 }
                 .padding()
-                .background(Color.blue)
                 .cornerRadius(30)
                 .buttonStyle(PlainButtonStyle())
                 .padding(.trailing, 10)
                 
-                //end
+                // end
                 Button {
-                    //endSession
+                    // endSession
                     if dontAskAgain {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
@@ -85,7 +84,7 @@ struct MainView: View {
                     } else if action == .retry {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
-                        speechViewModel.startRecording{}
+                        speechViewModel.startRecording {}
                     }
                     confirmationAction = nil
                 },
