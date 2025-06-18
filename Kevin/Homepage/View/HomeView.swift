@@ -11,6 +11,23 @@ struct HomeView: View {
     @StateObject private var viewModel = CategoryViewModel()
     @StateObject private var speechViewModel = SpeechViewModel()
     @State private var path = NavigationPath()
+    @State private var searchText = ""
+    
+    // Computed property to filter recordings based on search text
+    private var filteredRecordings: [URL] {
+        if searchText.isEmpty {
+            return speechViewModel.recordedVideos
+        } else {
+            return speechViewModel.recordedVideos.filter { url in
+                let recordingTitle = speechViewModel.getRecordingTitle(for: url)
+                let formattedDate = formatDate(from: url)
+                
+                // Search in both title and date
+                return recordingTitle.localizedCaseInsensitiveContains(searchText) ||
+                       formattedDate.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -51,15 +68,68 @@ struct HomeView: View {
                             .font(.system(size: 28))
 
                         Spacer()
-                        SearchBarView()
+                        SearchBarView(searchText: $searchText)
                             .padding(.trailing, 40)
                     }
+                    
+                    // Show search results info if searching
+                    if !searchText.isEmpty {
+                        HStack {
+                            Text("Found \(filteredRecordings.count) recording\(filteredRecordings.count == 1 ? "" : "s")")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .padding(.leading, 40)
+                            Spacer()
+                        }
+                        .padding(.top, 5)
+                    }
+                    
                     ScrollView {
                         LazyVStack {
-                            ForEach(speechViewModel.recordedVideos, id: \.self) { url in
-                                let recordingTitle = speechViewModel.getRecordingTitle(for: url)
-                                let recordingScore = speechViewModel.getRecordingScore(for: url)
-                                ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: recordingScore, tag: "test")
+                            if filteredRecordings.isEmpty && !searchText.isEmpty {
+                                // Show "no results" message when searching but no matches found
+                                VStack(spacing: 16) {
+                                    Image(systemName: "magnifyingglass")
+                                        .font(.system(size: 48))
+                                        .foregroundColor(.gray)
+                                    
+                                    Text("No recordings found")
+                                        .font(.title2)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.primary)
+                                    
+                                    Text("Try searching with different keywords")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
+                                }
+                                .padding(40)
+                                .frame(maxWidth: .infinity)
+                            } else if filteredRecordings.isEmpty && searchText.isEmpty && speechViewModel.recordedVideos.isEmpty {
+                                // Show "no recordings" message when no recordings exist
+                                VStack(spacing: 16) {
+                                    Image(systemName: "mic.slash")
+                                        .font(.system(size: 48))
+                                        .foregroundColor(.gray)
+                                    
+                                    Text("No recordings yet")
+                                        .font(.title2)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.primary)
+                                    
+                                    Text("Start by creating your first speech recording")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
+                                }
+                                .padding(40)
+                                .frame(maxWidth: .infinity)
+                            } else {
+                                ForEach(filteredRecordings, id: \.self) { url in
+                                    let recordingTitle = speechViewModel.getRecordingTitle(for: url)
+                                    let recordingScore = speechViewModel.getRecordingScore(for: url)
+                                    ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: recordingScore, tag: "test")
+                                }
                             }
                         }
                     }
