@@ -6,7 +6,6 @@
 //
 import SwiftUI
 
-// Add this custom navigation destination type
 struct SpeechDestination: Hashable {
     let practiceTitle: String
 }
@@ -53,7 +52,7 @@ struct CategoryCardListView: View {
             }
         }
         .navigationDestination(for: SpeechDestination.self) { destination in
-            SpeechView(practiceTitle: destination.practiceTitle)
+            SpeechView(practiceTitle: destination.practiceTitle, speechViewModel: SpeechViewModelStore.shared.speechViewModel)
         }
     }
     

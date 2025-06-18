@@ -9,8 +9,12 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel = CategoryViewModel()
-    @StateObject private var speechViewModel = SpeechViewModel()
+    @StateObject private var speechViewModelStore = SpeechViewModelStore.shared
     @State private var path = NavigationPath()
+    
+    private var speechViewModel: SpeechViewModel {
+        speechViewModelStore.speechViewModel
+    }
     
     var body: some View {
         ZStack {

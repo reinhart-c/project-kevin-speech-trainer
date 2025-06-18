@@ -252,6 +252,10 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
             if let last = self.recordedVideos.first { // Assuming sorted descending
                 self.lastRecordedVideoURL = last
             }
+            
+            // Load persisted titles and scores
+            loadRecordingTitles()
+            loadRecordingScores()
         } catch {
             print("Error while enumerating files \(documentsURL.path): \(error.localizedDescription)")
         }
@@ -266,13 +270,15 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
             return time1 > time2 // Sort descending, newest first
         }
     }
-    
+       
     func deleteRecording(url: URL) {
         do {
             try FileManager.default.removeItem(at: url)
             recordedVideos.removeAll { $0 == url }
             recordingTitles.removeValue(forKey: url)
             recordingScores.removeValue(forKey: url)
+            saveRecordingTitles()
+            saveRecordingScores()
             if lastRecordedVideoURL == url {
                 lastRecordedVideoURL = recordedVideos.first // newest if sorted
             }
@@ -294,6 +300,8 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
         recordingTitles.removeAll()
         recordingScores.removeAll()
         lastRecordedVideoURL = nil
+        saveRecordingTitles()
+        saveRecordingScores()
     }
     
     // MARK: - Speech Recognition
@@ -526,5 +534,43 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
     // Add this method to set recording title
     func setRecordingTitle(_ title: String, for url: URL) {
         recordingTitles[url] = title
+        saveRecordingTitles()
+    }
+    
+    // MARK: - Persistence
+    private func saveRecordingTitles() {
+        let data = recordingTitles.compactMapValues { $0 }.mapKeys { $0.lastPathComponent }
+        UserDefaults.standard.set(data, forKey: "recordingTitles")
+    }
+
+    private func loadRecordingTitles() {
+        if let data = UserDefaults.standard.dictionary(forKey: "recordingTitles") as? [String: String] {
+            let documentsURL = getDocumentsDirectory()
+            recordingTitles = Dictionary(uniqueKeysWithValues: data.compactMap { filename, title in
+                let url = documentsURL.appendingPathComponent(filename)
+                return FileManager.default.fileExists(atPath: url.path) ? (url, title) : nil
+            })
+        }
+    }
+
+    private func saveRecordingScores() {
+        let data = recordingScores.mapKeys { $0.lastPathComponent }
+        UserDefaults.standard.set(data, forKey: "recordingScores")
+    }
+
+    private func loadRecordingScores() {
+        if let data = UserDefaults.standard.dictionary(forKey: "recordingScores") as? [String: Int] {
+            let documentsURL = getDocumentsDirectory()
+            recordingScores = Dictionary(uniqueKeysWithValues: data.compactMap { filename, score in
+                let url = documentsURL.appendingPathComponent(filename)
+                return FileManager.default.fileExists(atPath: url.path) ? (url, score) : nil
+            })
+        }
+    }
+}
+
+extension Dictionary {
+    func mapKeys<NewKey: Hashable>(_ transform: (Key) -> NewKey) -> [NewKey: Value] {
+        return Dictionary<NewKey, Value>(uniqueKeysWithValues: map { (transform($0.key), $0.value) })
     }
 }
