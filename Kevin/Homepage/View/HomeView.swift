@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+// Add navigation destination for recordings
+struct RecordingDestination: Hashable {
+    let recordingURL: URL
+    let practiceTitle: String
+}
+
 struct HomeView: View {
     @ObservedObject private var speechViewModelStore = SpeechViewModelStore.shared
     @State private var path = NavigationPath()
@@ -63,7 +69,24 @@ struct HomeView: View {
                             ForEach(speechViewModel.recordedVideos, id: \.self) { url in
                                 let recordingTitle = speechViewModel.getRecordingTitle(for: url)
                                 let score = speechViewModel.getRecordingScore(for: url) ?? 0
-                                ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: score, tag: "test")
+                                Button(action: {
+                                    let destination = RecordingDestination(
+                                        recordingURL: url,
+                                        practiceTitle: recordingTitle
+                                    )
+                                    path.append(destination)
+                                }) {
+                                    ProgressItem(
+                                        title: recordingTitle,
+                                        date: formatDate(from: url),
+                                        categoryName: "Test",
+                                        categoryColor: .blue,
+                                        categoryIcon: "test",
+                                        score: score,
+                                        tag: "test"
+                                    )
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                     }
@@ -76,6 +99,14 @@ struct HomeView: View {
                     speechViewModel.loadRecordings()
                 }
                 .onChange(of: speechViewModel.recordedVideos) { _, _ in
+                }
+                .navigationDestination(for: RecordingDestination.self) { destination in
+                    SpeechView(
+                        practiceTitle: destination.practiceTitle,
+                        speechViewModel: speechViewModelStore.speechViewModel,
+                        path: $path,
+                        preselectedVideoURL: destination.recordingURL
+                    )
                 }
             }
         }
