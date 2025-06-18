@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class CategoryViewModel: ObservableObject {
+internal class CategoryViewModel: ObservableObject {
     @Published var categories: [Category] = [
         Category(
             title: "Product deserves the spotlight",

@@ -283,12 +283,12 @@ struct EmotionBar: View {
 
 #Preview {
     ResultView(viewModel: {
-        let vm = ResultViewModel()
-        vm.result = Result(
+        let rvm = ResultViewModel()
+        rvm.result = Result(
             transcribedText: "Hello world this is a test with some extra words",
             expectedText: "Hello world this is a test"
         )
-        return vm
+        return rvm
     }()) {
         print("Reset tapped")
     }
