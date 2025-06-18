@@ -524,6 +524,7 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
     // Add this method to set recording score
     func setRecordingScore(_ score: Int, for url: URL) {
         recordingScores[url] = score
+        saveRecordingScores()
     }
     
     // Add this method to get recording score
