@@ -5,10 +5,9 @@
 //  Created by Vincent Wisnata on 18/06/25.
 //
 
-
 import SwiftUI
 
-class OnboardingViewModel: ObservableObject {
+internal class OnboardingViewModel: ObservableObject {
     @Published var onboardingItems: [Onboarding] = [
         Onboarding(
             title: "Find A Quiet Place",
@@ -51,8 +50,7 @@ class OnboardingViewModel: ObservableObject {
         }
     }
     func skipOnboarding() {
-        //handled in view
-        //currentPage = onboardingItems.count - 1
+        // handled in view
+        // currentPage = onboardingItems.count - 1
     }
 }
-

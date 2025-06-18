@@ -14,7 +14,7 @@ struct OnboardingView: View {
             Color.white
                 .ignoresSafeArea()
             VStack(spacing: 0) {
-                HStack{
+                HStack {
                     Spacer()
                     Button(action: {
                         onReady()
@@ -41,7 +41,7 @@ struct OnboardingView: View {
                         // Left side - Skip button
                         Button {
                             onReady()
-                            //viewModel.skipOnboarding()
+                            // viewModel.skipOnboarding()
                         } label: {
                             Text("Skip").foregroundColor(.gray)
                         }

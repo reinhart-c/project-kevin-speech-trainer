@@ -12,8 +12,8 @@ struct CategoryCardListView: View {
     
     @StateObject private var viewModel = CategoryViewModel()
     @Binding var path: NavigationPath
-    @State private var presentedCategory: Category? = nil
-    @State private var selectedCategory: Category? = nil
+    @State private var presentedCategory: Category?
+    @State private var selectedCategory: Category?
     
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
