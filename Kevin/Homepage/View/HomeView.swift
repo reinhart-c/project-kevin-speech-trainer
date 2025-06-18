@@ -19,6 +19,7 @@ struct HomeView: View {
                     HStack {
                         (
                             Text("\"Say It\"")
+                                .fontWeight(.bold)
                                 .foregroundStyle(
                                     LinearGradient(colors: [.purpleTitle, .blueTitle], startPoint: .leading, endPoint: .trailing))
 
@@ -67,7 +68,7 @@ struct HomeView: View {
                 speechViewModel.loadRecordings()
             }
             .navigationDestination(for: String.self) { recordingTitle in
-                SpeechView()
+                SpeechView(speechViewModel: speechViewModel)
                     .onAppear {
                         speechViewModel.setRecordingTitle(recordingTitle)
                     }
