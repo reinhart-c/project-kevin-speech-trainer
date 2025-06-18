@@ -12,7 +12,7 @@ struct EmotionResultData {
     let dominantEmotionValue: Double?
     let emotionAverage: [String: Double]?
     
-    init(_ dominantEmotionKey: String?, _ dominantEmotionValue: Double?, _ emotionAverage: [String : Double]?) {
+    init(_ dominantEmotionKey: String?, _ dominantEmotionValue: Double?, _ emotionAverage: [String: Double]?) {
         self.dominantEmotionKey = dominantEmotionKey
         self.dominantEmotionValue = dominantEmotionValue
         self.emotionAverage = emotionAverage
