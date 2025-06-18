@@ -31,8 +31,9 @@ struct SpeechView: View {
             HStack(spacing: 30) {
                 
                 Text("Product deserves the spotlight") // category.title
-                    .font(.system(size: 30, weight: .semibold))
+                    .font(.system(size: 23, weight: .semibold))
                     .padding(.leading, 40)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
@@ -116,38 +117,27 @@ struct SpeechView: View {
                         .buttonStyle(PlainButtonStyle())
                         .disabled(!speechViewModel.hasCameraPermissions)
                         
+                        ProgressBar()
+                            .padding(.trailing, 40)
                     } else {
-                        // Always show Record button when not recording and in camera mode
-                        Button(action: {
-                            showingResult = false
-                            resultViewModel.reset()
-                            prompterViewModel.resetHighlighting()
-                            speechViewModel.startRecording {
-                                prompterViewModel.startHighlighting()
-                            }
-                            showingVideoPlayer = false
-                            speechViewModel.transcriptionText = ""
-                            speechViewModel.transcriptionError = nil
-                            speechViewModel.emotionResults = []
-                        }) {
-                            VStack {
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 100, height: 100)
-                                    .overlay(
-                                        Image(systemName: "record.circle")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 32))
-                                    )
-                                Text("Record")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                            }
+                        // go to home page
+                        Button {
+                            // Action to go back to home
+                        } label: {
+                            Text("Back to Home")
+                                .font(.system(size: 15))
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 15)
+                                .overlay(
+                                    Capsule()
+                                        .stroke(Color.black, lineWidth: 1)
+                                )
                         }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.trailing, 40)
                         .disabled(!speechViewModel.hasCameraPermissions)
                     }
-                    ProgressBar()
-                        .padding(.trailing, 40)
                 }
             }
             .padding()
