@@ -9,9 +9,6 @@ import SwiftUI
 
 struct PrompterView: View {
     @ObservedObject var viewModel: PrompterViewModel
-    @StateObject private var speechViewModel = SpeechViewModel()
-    @StateObject private var prompterViewModel = PrompterViewModel()
-    @StateObject private var resultViewModel = ResultViewModel()
     
     @State private var showingResult = false
     @State private var showingVideoPlayer = false
@@ -24,7 +21,8 @@ struct PrompterView: View {
                     .fill(Color.gray.opacity(0.1))
                     .overlay(
                         ScrollView {
-                            if !speechViewModel.isRecording{
+                            // Check if we're recording by looking at currentWordIndex
+                            if viewModel.currentWordIndex == -1 {
                                 
                                 Text("Get Ready to Speak!\n\n")
                                     .foregroundStyle(.gray)
@@ -40,15 +38,9 @@ struct PrompterView: View {
                                 // Always show Record button when not recording and in camera mode
                                 Button{
                                     showingResult = false
-                                    resultViewModel.reset()
-                                    prompterViewModel.resetHighlighting()
-                                    speechViewModel.startRecording {
-                                        prompterViewModel.startHighlighting()
-                                    }
+                                    viewModel.resetHighlighting()
+                                    // Note: Recording start should be handled by parent view
                                     showingVideoPlayer = false
-                                    speechViewModel.transcriptionText = ""
-                                    speechViewModel.transcriptionError = nil
-                                    speechViewModel.emotionResults = []
                                 } label:{
                                     Text("Start Now")
                                         .foregroundColor(.white)
@@ -59,7 +51,6 @@ struct PrompterView: View {
                                 }
                                 .padding(.top, 200)
                                 .buttonStyle(PlainButtonStyle())
-                                .disabled(!speechViewModel.hasCameraPermissions)
                                 
                             }
                             else{
@@ -67,7 +58,6 @@ struct PrompterView: View {
                                     let (index, word) = pair
                                     return accumulatedText +
                                     Text(word + " ")
-                                    //.font(.title3)
                                         .font(.system(size:19, weight: .medium))
                                         .foregroundColor(index == viewModel.currentWordIndex ? Color.accentColor : Color.primary) // Highlight current word
                                 }
