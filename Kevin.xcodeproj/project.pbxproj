@@ -31,6 +31,7 @@
 		CBDC3CDD2DF984750051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBDC3D092DFAB4A00051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBF56FEC2E02A7A200F13383 /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
+		CBF5758E2E03E5D100F13383 /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -95,6 +96,11 @@
 			sourceTree = "<group>";
 		};
 		CBF56FF02E02A7A200F13383 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CBF575922E03E5D100F13383 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -169,6 +175,10 @@
 				{
 					ProductGroup = CB3CADDD2E000634006BA58D /* Products */;
 					ProjectRef = CB3CADD92E000634006BA58D /* Kevin.xcodeproj */;
+				},
+				{
+					ProductGroup = CBF575922E03E5D100F13383 /* Products */;
+					ProjectRef = CBF5758E2E03E5D100F13383 /* Kevin.xcodeproj */;
 				},
 				{
 					ProductGroup = CBDC3D0C2DFAB4A00051B96A /* Products */;
@@ -363,7 +373,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CNJ5SCX4VJ;
+				DEVELOPMENT_TEAM = UA7H73P97K;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -395,7 +405,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CNJ5SCX4VJ;
+				DEVELOPMENT_TEAM = UA7H73P97K;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
