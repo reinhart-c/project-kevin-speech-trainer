@@ -13,18 +13,6 @@ struct ResultView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                Text("Speech Analysis")
-                    .font(.headline)
-                
-                Spacer()
-                
-                Button("Try Again") {
-                    onReset()
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-            }
             
             if viewModel.isCalculating {
                 VStack(spacing: 16) {
@@ -39,34 +27,19 @@ struct ResultView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         // Score Display
-                        VStack(spacing: 10) {
-                            Text("\(result.score)")
-                                .font(.system(size: 72, weight: .bold, design: .rounded))
-                                .foregroundColor(viewModel.scoreColor) // Removed Color() wrapper
-                            
-                            Text(viewModel.scoreGrade)
-                                .font(.title2)
-                                .fontWeight(.medium)
-                                .foregroundColor(viewModel.scoreColor) // Removed Color() wrapper
-                            
-                            Text("out of 100")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                        VStack() {
+                            HalfRingFluencyGauge(score: result.score)
+                                .padding(.bottom, 8)
+                                .padding(.top, -17)
                             
                             // Statistics
-                            
-                            // StatRow(
-                            // title: "Words Matched",
-                            // value: "\(result.matchedWords.count) times",
-                            // color: .pinkText
-                            // )
-                            
                             if !result.missedWords.isEmpty {
                                 StatRow(
                                     title: "Missed Words",
-                                    value: "\(result.missedWords.count)",
+                                    value: "\(result.missedWords.count) times",
                                     color: .pinkText
                                 )
+                                .padding(.bottom, -27)
                             }
                             
                             if !result.extraWords.isEmpty {
@@ -79,8 +52,7 @@ struct ResultView: View {
                             
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
-                        .background(Color.white) // Use .opacity directly on the Color
+                        .background(Color.white)
                         .cornerRadius(15)
                         
                         // Removed the Dominant Emotion StatRow since it's shown in the dedicated emotion analysis section
@@ -120,9 +92,6 @@ struct ResultView: View {
                         // Detailed Breakdown (Optional)
                         if !result.extraWords.isEmpty || !result.missedWords.isEmpty {
                             VStack(alignment: .leading, spacing: 12) {
-                                Text("Details")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
                                 
                                 if !result.extraWords.isEmpty {
                                     DetailSection(
@@ -162,8 +131,8 @@ struct ResultView: View {
         }
         .frame(width: 300)
         .padding()
-        .background(Color.lightBlue)
-        .cornerRadius(10)
+//        .background(Color.lightBlue)
+//        .cornerRadius(10)
     }
     
     private func createRadarDataPoints(from emotionBreakdown: [String: Double]) -> [RadarModel] {
@@ -225,15 +194,15 @@ struct DetailSection: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.subheadline)
-                .fontWeight(.medium)
+                .fontWeight(.semibold)
                 .foregroundColor(color)
             
             Text(words.joined(separator: ", "))
                 .font(.caption)
-                .foregroundColor(.secondary)
-                .padding(8)
+                .foregroundColor(.black)
+                //.padding(8)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(color.opacity(0.1))
+                //.background(color.opacity(0.1))
                 .cornerRadius(6)
         }
     }
@@ -280,7 +249,7 @@ struct EmotionBar: View {
     ResultView(viewModel: {
         let rvm = ResultViewModel()
         rvm.result = Result(
-            transcribedText: "Hello world this is a test with some extra words",
+            transcribedText: "Hello this is a test with some extra words",
             expectedText: "Hello world this is a test"
         )
         return rvm
