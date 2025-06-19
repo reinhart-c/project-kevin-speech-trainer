@@ -7,10 +7,20 @@
 
 import SwiftUI
 
+// Add navigation destination for recordings
+struct RecordingDestination: Hashable {
+    let recordingURL: URL
+    let practiceTitle: String
+}
+
 struct HomeView: View {
-    @StateObject private var viewModel = CategoryViewModel()
-    @StateObject private var speechViewModel = SpeechViewModel()
+    @ObservedObject private var speechViewModelStore = SpeechViewModelStore.shared
     @State private var path = NavigationPath()
+    
+    private var speechViewModel: SpeechViewModel {
+        speechViewModelStore.speechViewModel
+    }
+    
     var body: some View {
         ZStack {
             Color.white
@@ -20,7 +30,7 @@ struct HomeView: View {
                     VStack {
                         HStack {
                             (
-                                Text("**“Say It”**")
+                                Text("\"Say It\"")
                                     .foregroundStyle(
                                         LinearGradient(colors: [.purpleTitle, .blueTitle], startPoint: .leading, endPoint: .trailing))
                                 
@@ -55,24 +65,48 @@ struct HomeView: View {
                             SearchBarView()
                                 .padding(.trailing, 40)
                         }
-                        ScrollView {
-                            LazyVStack {
-                                ForEach(speechViewModel.recordedVideos, id: \.self) { url in
-                                    let index = speechViewModel.recordedVideos.firstIndex(of: url) ?? -1
-                                    let recordingTitle = "Recording \(speechViewModel.recordedVideos.count - index)"
-                                    ProgressItem(title: recordingTitle, date: formatDate(from: url), categoryName: "Test", categoryColor: .blue, categoryIcon: "test", score: 30, tag: "test")
+                        LazyVStack {
+                            ForEach(speechViewModel.recordedVideos, id: \.self) { url in
+                                let recordingTitle = speechViewModel.getRecordingTitle(for: url)
+                                let score = speechViewModel.getRecordingScore(for: url) ?? 0
+                                Button(action: {
+                                    let destination = RecordingDestination(
+                                        recordingURL: url,
+                                        practiceTitle: recordingTitle
+                                    )
+                                    path.append(destination)
+                                }) {
+                                    ProgressItem(
+                                        title: recordingTitle,
+                                        date: formatDate(from: url),
+                                        categoryName: "Test",
+                                        categoryColor: .blue,
+                                        categoryIcon: "test",
+                                        score: score,
+                                        tag: "test"
+                                    )
                                 }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                     }
                     .padding()
-                }.onAppear {
+                }
+                .onAppear {
                     speechViewModel.loadRecordings()
                 }
-                .navigationDestination(for: String.self) { val in
-                    if val == "SpeechView" {
-                        SpeechView()
-                    }
+                .refreshable {
+                    speechViewModel.loadRecordings()
+                }
+                .onChange(of: speechViewModel.recordedVideos) { _, _ in
+                }
+                .navigationDestination(for: RecordingDestination.self) { destination in
+                    SpeechView(
+                        practiceTitle: destination.practiceTitle,
+                        speechViewModel: speechViewModelStore.speechViewModel,
+                        path: $path,
+                        preselectedVideoURL: destination.recordingURL
+                    )
                 }
             }
         }

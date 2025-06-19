@@ -6,6 +6,10 @@
 //
 import SwiftUI
 
+struct SpeechDestination: Hashable {
+    let practiceTitle: String
+}
+
 struct CategoryCardListView: View {
     @State private var showOnboarding = true
     @State private var onboardingCompleted = false
@@ -14,6 +18,7 @@ struct CategoryCardListView: View {
     @Binding var path: NavigationPath
     @State private var presentedCategory: Category?
     @State private var selectedCategory: Category?
+    @State private var practiceTitle: String = ""
     
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -41,9 +46,13 @@ struct CategoryCardListView: View {
             }
         }
         .sheet(item: $presentedCategory) { category in
-            CategoryModalView(category: category) {
-                path.append("SpeechView")
+            CategoryModalView(category: category) { title in
+                practiceTitle = title
+                path.append(SpeechDestination(practiceTitle: title))
             }
+        }
+        .navigationDestination(for: SpeechDestination.self) { destination in
+            SpeechView(practiceTitle: destination.practiceTitle, speechViewModel: SpeechViewModelStore.shared.speechViewModel, path: $path)
         }
     }
     
@@ -57,6 +66,7 @@ struct CategoryCardListView: View {
         }
     }
 }
+
 #Preview {
 //    CategoryCardListView()
 }
