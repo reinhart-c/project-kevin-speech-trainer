@@ -29,7 +29,7 @@ struct ResultView: View {
                         // Score Display
                         VStack() {
                             HalfRingFluencyGauge(score: result.score)
-                                .padding(.bottom, 8)
+                                .padding(.bottom, 28)
                                 .padding(.top, -17)
                             
                             // Statistics
@@ -39,7 +39,7 @@ struct ResultView: View {
                                     value: "\(result.missedWords.count) times",
                                     color: .pinkText
                                 )
-                                .padding(.bottom, -27)
+
                             }
                             
                             if !result.extraWords.isEmpty {
@@ -138,16 +138,18 @@ struct StatRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.body)
+                .font(.system(size: 14, weight: .light))
             
             Spacer()
             
             Text(value)
-                .font(.body)
+                .font(.system(size: 14))
                 .fontWeight(.semibold)
                 .foregroundColor(color)
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.bottom, 10)
+        
     }
 }
 

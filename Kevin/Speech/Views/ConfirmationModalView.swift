@@ -20,10 +20,10 @@ struct ConfirmationModalView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Image(systemName: "exclamationmark.triangle.fill")
+            Image("ConfirmationModal")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 60, height: 60)
+                .frame(width: 200, height: 200)
                 .foregroundColor(.yellow)
 
             Text(actionType == .endSession ? "Wanna leave already?" : "Wanna try again?")
@@ -48,7 +48,7 @@ struct ConfirmationModalView: View {
                     Text(actionType == .endSession ? "End Session" : "Yes")
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(actionType == .endSession ? Color.redButton : Color.blueButton)
+                        .background(actionType == .endSession ? Color.redButton : Color.black)
                         .foregroundColor(.white)
                         .cornerRadius(30)
                 }
