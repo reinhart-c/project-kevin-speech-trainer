@@ -62,13 +62,16 @@ struct CategoryCardView: View {
             HStack(spacing: 4) {
                 if category.tag == "Product" {
                     Text("Product")
-                        .font(.system(size: 20))
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(Color.blueButton)
                 } else if category.tag == "Political" {
                     Text("Political")
-                        .font(.system(size: 20))
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(Color.pinkText)
                 } else {
                     Text("Social Advocacy")
-                        .font(.system(size: 20))
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(Color.purpleText)
                 }
             }
             .foregroundColor(.gray)

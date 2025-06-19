@@ -154,7 +154,7 @@ struct SpeechView: View {
                 .font(.system(size: 20))
         }
         .padding()
-        .background(Color.red)
+        .background(Color.redButton)
         .cornerRadius(30)
         .buttonStyle(PlainButtonStyle())
         .disabled(!speechViewModel.hasCameraPermissions)
