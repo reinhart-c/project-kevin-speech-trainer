@@ -27,7 +27,7 @@ struct ResultView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         // Score Display
-                        VStack() {
+                        VStack {
                             HalfRingFluencyGauge(score: result.score)
                                 .padding(.bottom, 28)
                                 .padding(.top, -17)
@@ -56,7 +56,6 @@ struct ResultView: View {
                         .cornerRadius(15)
                         
                         // Removed the Dominant Emotion StatRow since it's shown in the dedicated emotion analysis section
-                        
                         
                        // Detailed Breakdown (Optional)
                         if !result.extraWords.isEmpty || !result.missedWords.isEmpty {
@@ -161,16 +160,16 @@ struct DetailSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.system(size: 14, weight:.semibold))
+                .font(.system(size: 14, weight: .semibold))
                 .fontWeight(.semibold)
                 .foregroundColor(color)
             
             Text(words.joined(separator: ", "))
                 .font(.system(size: 13))
                 .foregroundColor(.black)
-                //.padding(8)
+                // .padding(8)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                //.background(color.opacity(0.1))
+                // .background(color.opacity(0.1))
                 .cornerRadius(6)
         }
         .padding()

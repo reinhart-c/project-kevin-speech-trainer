@@ -5,7 +5,6 @@
 //  Created by Alifa Reppawali on 18/06/25.
 //
 
-
 import SwiftUI
 
 struct HalfRingFluencyGauge: View {
@@ -23,7 +22,7 @@ struct HalfRingFluencyGauge: View {
             let radius = min(size.width, size.height) * 0.6
             let center = CGPoint(x: size.width / 2, y: size.height * 0.8)
 
-            let startAngle = Angle(degrees: 160)
+//            let startAngle = Angle(degrees: 160)
             let endAngle = Angle(degrees: 160 + (220 * percentage))
 
             ZStack {
@@ -82,7 +81,7 @@ struct HalfRingFluencyGauge: View {
                         .font(.system(size: 15))
                         .foregroundColor(.gray)
                     
-                    HStack{
+                    HStack {
                         Text("0")
                             .font(.system(size: 25))
                             .foregroundStyle(LinearGradient(

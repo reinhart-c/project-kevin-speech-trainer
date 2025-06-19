@@ -51,7 +51,6 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
         (transcriptionText.isEmpty || emotionResults.isEmpty)
     }
 
-    
     override init() {
         super.init()
         loadRecordings() // Load existing recordings on init

@@ -68,7 +68,6 @@ struct SegmentedResult: View {
     }
 }
 
-
 #Preview {
     struct PreviewWrapper: View {
         @StateObject private var viewModel = ResultViewModel()
@@ -79,10 +78,10 @@ struct SegmentedResult: View {
                 expectedText: "This is my expected text"
             )
 
-            let vm = ResultViewModel()
-            vm.result = mockResult
-            vm.isCalculating = false
-            _viewModel = StateObject(wrappedValue: vm)
+            let rvm = ResultViewModel()
+            rvm.result = mockResult
+            rvm.isCalculating = false
+            _viewModel = StateObject(wrappedValue: rvm)
         }
 
         var body: some View {
@@ -92,4 +91,3 @@ struct SegmentedResult: View {
 
     return PreviewWrapper()
 }
-

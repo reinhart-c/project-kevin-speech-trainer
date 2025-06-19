@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class SpeechViewModelStore: ObservableObject {
+internal class SpeechViewModelStore: ObservableObject {
     static let shared = SpeechViewModelStore()
     
     @Published var speechViewModel = SpeechViewModel()

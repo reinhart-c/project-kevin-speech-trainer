@@ -86,7 +86,6 @@ struct EmotionRadarView: View {
     var dimensions: [EmotionDimension]
     var data: [EmotionDataPoint]
     
-
     init(width: CGFloat, mainColor: Color = .blue, subtleColor: Color = .gray,
          quantityIncrementalDividers: Int = 3, dimensions: [EmotionDimension],
          data: [EmotionDataPoint]) {
@@ -107,7 +106,7 @@ struct EmotionRadarView: View {
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
-                        //.padding()
+                        // .padding()
                     Spacer()
                     
                     // Existing Radar Chart -> change to donut chart
@@ -120,13 +119,13 @@ struct EmotionRadarView: View {
                 .background(Color.white)
                 .cornerRadius(10)
                 
-                VStack(alignment: .leading, spacing: 8){
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Explanation")
                         .font(.system(size: 13, weight: .medium))
                     
                     let dominant = getDominantEmotion().emotion
 
-                    Group{
+                    Group {
                         if dominant == "Fearful" {
                             Text("😨 Fear: High pitch, cautious rhythm")
                         } else if dominant == "Sad" {
@@ -150,7 +149,7 @@ struct EmotionRadarView: View {
                 .cornerRadius(10)
             }
             .frame(width: 300)
-            //.padding()
+            // .padding()
 //            .background(Color.lightBlue)
 //            .cornerRadius(10)
         }
@@ -218,7 +217,7 @@ struct EmotionDonutChart: View {
         GeometryReader { geo in
             let size = min(geo.size.width, geo.size.height)
             let lineWidth = size * 0.2
-            let radius = size / 2
+//            let radius = size / 2
 
             ZStack {
                 ForEach(entries.indices, id: \.self) { index in
@@ -294,8 +293,6 @@ struct EmotionLegend: View {
     }
 }
 
-
-
 struct CircleArc: Shape {
     var startAngle: Angle
     var endAngle: Angle
@@ -311,7 +308,6 @@ struct CircleArc: Shape {
         return path
     }
 }
-
 
 struct EmotionRingView: View {
     var dataPoint: EmotionDataPoint
@@ -352,7 +348,6 @@ struct EmotionRingView: View {
         }
     }
 }
-
 
 // Helper functions
 func deg2rad(_ number: CGFloat) -> CGFloat {

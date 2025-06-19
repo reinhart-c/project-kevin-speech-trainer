@@ -86,4 +86,3 @@ struct SpeechResultView: View {
 
     return PreviewWrapper()
 }
-
