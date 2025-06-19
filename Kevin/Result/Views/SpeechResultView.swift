@@ -70,6 +70,15 @@ struct SpeechResultView: View {
                 .frame(width: 400, height: 500)
                 
             }
+            HStack {
+                Rectangle()
+               // ResultView() // score and emotion
+            }
+            .padding([.leading, .trailing], 40)
+            .background(Color.lightBlue)
+            .cornerRadius(20)
+            .frame(width: 400, height: 500)
+                        
         }
     }
 }

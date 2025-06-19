@@ -33,7 +33,7 @@ struct SpeechView: View {
                 Text("Product deserves the spotlight") // category.title
                     .font(.system(size: 23, weight: .semibold))
                     .padding(.leading, 40)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color.black)
                 
                 Spacer()
                 
@@ -121,6 +121,7 @@ struct SpeechView: View {
                             .padding(.trailing, 40)
                     } else {
                         // go to home page
+                        
                         Button {
                             // Action to go back to home
                         } label: {
@@ -137,6 +138,7 @@ struct SpeechView: View {
                         .buttonStyle(PlainButtonStyle())
                         .padding(.trailing, 40)
                         .disabled(!speechViewModel.hasCameraPermissions)
+                        
                     }
                 }
             }
@@ -328,7 +330,7 @@ struct SpeechView: View {
                     } else if action == .retry {
                         speechViewModel.stopRecording()
                         speechViewModel.stopSession()
-                        speechViewModel.startRecording{}
+                        speechViewModel.startRecording {}
                     }
                     confirmationAction = nil
                 },
