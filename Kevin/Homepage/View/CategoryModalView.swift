@@ -60,15 +60,29 @@ struct CategoryModalView: View {
                     onReady(title.isEmpty ? "Untitled Practice" : title) // Pass the title
                     dismiss()
                 } label: {
-                    Text("I'm Ready")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.black)
-                        .foregroundColor(.white)
-                        .font(.system(size: 18))
-                        .buttonStyle(PlainButtonStyle())
-                        .frame(width: 180)
-                        .cornerRadius(999)
+                    if title == ""{
+                        //disabled
+                        Text("I'm Ready")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.gray)
+                            .foregroundColor(.white)
+                            .font(.system(size: 18))
+                            .buttonStyle(PlainButtonStyle())
+                            .frame(width: 180)
+                            .cornerRadius(999)
+                    }else{
+                        //enabled
+                        Text("I'm Ready")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.black)
+                            .foregroundColor(.white)
+                            .font(.system(size: 18))
+                            .buttonStyle(PlainButtonStyle())
+                            .frame(width: 180)
+                            .cornerRadius(999)
+                    }
                 }.buttonStyle(.plain)
             }
             .padding(.horizontal)
