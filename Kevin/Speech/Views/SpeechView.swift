@@ -93,7 +93,7 @@ struct SpeechView: View {
             
             Spacer()
             
-            if !showingVideoPlayer {
+            if !showingVideoPlayer || showingResult {
                 recordingControlsView
             }
         }
