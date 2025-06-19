@@ -42,21 +42,35 @@ struct SegmentedResult: View {
                     case .fluency:
                         ResultView(viewModel: viewModel, onReset: onReset)
                     case .tone:
-                        EmotionRadarView(
-                            width: 300,
-                            mainColor: .blue,
-                            subtleColor: .gray,
-                            quantityIncrementalDividers: 3,
-                            dimensions: emotionDimensions,
-                            data: [
-                                EmotionDataPoint(
-                                    angry: 20, disgust: 5, fearful: 60,
-                                    happy: 15, neutral: 25, sad: 30,
-                                    color: .blue
-                                )
-                            ]
-                        )
-                        .padding()
+                        if let result = viewModel.result,
+                           let emotionBreakdown = result.emotionBreakdown {
+                            EmotionRadarView(
+                                width: 300,
+                                mainColor: .blue,
+                                subtleColor: .gray,
+                                quantityIncrementalDividers: 3,
+                                dimensions: emotionDimensions,
+                                data: [
+                                    EmotionDataPoint(
+                                        emotionBreakdown: emotionBreakdown,
+                                        color: .blue
+                                    )
+                                ]
+                            )
+                            .padding()
+                        } else {
+                            VStack(spacing: 16) {
+                                Text("No emotion data available")
+                                    .font(.title2)
+                                    .foregroundColor(.secondary)
+                                Text("Try recording again to get emotion analysis")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, maxHeight: 200)
+                        }
                     }
                 }
             }
