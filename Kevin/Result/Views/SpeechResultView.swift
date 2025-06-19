@@ -59,7 +59,7 @@ struct SpeechResultView: View {
                     SegmentedResult(
                         viewModel: viewModel,
                         onReset: {
-                            viewModel.reset() // implement this function in your view model
+                            viewModel.reset() 
                         }
                     )
                     
@@ -70,14 +70,6 @@ struct SpeechResultView: View {
                 .frame(width: 400, height: 500)
                 
             }
-            HStack {
-                Rectangle()
-               // ResultView() // score and emotion
-            }
-            .padding([.leading, .trailing], 40)
-            .background(Color.lightBlue)
-            .cornerRadius(20)
-            .frame(width: 400, height: 500)
                         
         }
     }

@@ -58,38 +58,7 @@ struct ResultView: View {
                         // Removed the Dominant Emotion StatRow since it's shown in the dedicated emotion analysis section
                         
                         
-                        // Add emotion breakdown section if available
-                        if let emotionBreakdown = result.emotionBreakdown {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Emotion Analysis")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                
-                                // Updated EmotionRadarView with dominant emotion display
-                                EmotionRadarView(
-                                    width: 280, // Increased width to accommodate the header
-                                    mainColor: .blue,
-                                    subtleColor: .gray,
-                                    quantityIncrementalDividers: 3,
-                                    dimensions: emotionDimensions,
-                                    data: [EmotionDataPoint(emotionBreakdown: emotionBreakdown, color: .blue)]
-                                )
-                                .padding(.vertical, 10)
-                                
-                                ForEach(emotionBreakdown.sorted(by: { $0.value > $1.value }), id: \.key) { emotion, percentage in
-                                    EmotionBar(
-                                        emotion: emotion,
-                                        percentage: percentage,
-                                        color: emotionColor(for: emotion)
-                                    )
-                                }
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(10)
-                        }
-                        
-                        // Detailed Breakdown (Optional)
+                       // Detailed Breakdown (Optional)
                         if !result.extraWords.isEmpty || !result.missedWords.isEmpty {
                             VStack(alignment: .leading, spacing: 12) {
                                 
@@ -109,9 +78,6 @@ struct ResultView: View {
                                     )
                                 }
                             }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(10)
                         }
                     }
                 }
@@ -193,18 +159,21 @@ struct DetailSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.subheadline)
+                .font(.system(size: 14, weight:.semibold))
                 .fontWeight(.semibold)
                 .foregroundColor(color)
             
             Text(words.joined(separator: ", "))
-                .font(.caption)
+                .font(.system(size: 13))
                 .foregroundColor(.black)
                 //.padding(8)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 //.background(color.opacity(0.1))
                 .cornerRadius(6)
         }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
     }
 }
 

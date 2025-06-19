@@ -93,9 +93,7 @@ struct SpeechView: View {
             
             Spacer()
             
-            if showingVideoPlayer {
-                playbackControlButton
-            } else {
+            if !showingVideoPlayer {
                 recordingControlsView
             }
         }
@@ -186,7 +184,7 @@ struct SpeechView: View {
             cameraVideoView
             
             if showingResult {
-                ResultView(viewModel: resultViewModel) {
+                SegmentedResult(viewModel: resultViewModel) {
                     resetToInitialState()
                 }
             } else {
@@ -223,6 +221,7 @@ struct SpeechView: View {
 
             cameraOverlayView
         }
+        .padding(.leading, 40)
     }
     
     private var cameraOverlayView: some View {

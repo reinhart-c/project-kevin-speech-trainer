@@ -61,7 +61,7 @@ struct SegmentedResult: View {
                 }
             }
             .padding()
-            .frame(maxWidth: 350)
+            .frame(maxWidth: 350, maxHeight: 600)
             .background(Color.blueSegmented)
             .cornerRadius(24)
         }

@@ -24,7 +24,7 @@ struct HalfRingFluencyGauge: View {
             let center = CGPoint(x: size.width / 2, y: size.height * 0.8)
 
             let startAngle = Angle(degrees: 160)
-            let endAngle = Angle(degrees: 190 + (190 * percentage))
+            let endAngle = Angle(degrees: 160 + (220 * percentage))
 
             ZStack {
                 // Background arc
@@ -79,7 +79,7 @@ struct HalfRingFluencyGauge: View {
                         .padding(.top, textOffsetY)
                     
                     Text("Fluency Score")
-                        .font(.subheadline)
+                        .font(.system(size: 15))
                         .foregroundColor(.gray)
                     
                     HStack{
@@ -113,8 +113,8 @@ struct HalfRingFluencyGauge: View {
 
 #Preview {
     VStack(spacing: 10) {
-        HalfRingFluencyGauge(score: 20)
+        HalfRingFluencyGauge(score: 0)
         HalfRingFluencyGauge(score: 100)
-        HalfRingFluencyGauge(score: 70)
+        HalfRingFluencyGauge(score: 3)
     }
 }

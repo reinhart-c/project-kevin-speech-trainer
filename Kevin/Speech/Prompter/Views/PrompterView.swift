@@ -19,7 +19,7 @@ struct PrompterView: View {
         VStack(alignment: .leading) {
             ZStack {
                 // Main content with corner radius
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 30)
                     .fill(Color.gray.opacity(0.1))
                     .overlay(
                         ScrollView {
@@ -66,7 +66,7 @@ struct PrompterView: View {
                         }
                             .frame(height: 380)
                         // Apply corner radius to scroll content too
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .clipShape(RoundedRectangle(cornerRadius: 30))
                     )
                     .mask(
                         VStack(spacing: 0) {
@@ -87,11 +87,11 @@ struct PrompterView: View {
                             .frame(height: 30)
                         }
                     )
-                    .frame(height: 380)
+                    .frame(height: 580)
             }
         }
-        .frame(width: 300)
-        .frame(maxHeight: .infinity)
+        .frame(width: 400, height: 580)
+        .padding(.trailing, 40)
     }
 }
 
