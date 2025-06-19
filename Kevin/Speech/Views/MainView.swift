@@ -17,6 +17,7 @@ struct MainView: View {
     var body: some View {
         VStack {
             HStack {
+                
                 Text("Product deserves the spotlight") // category.title
                     .font(.system(size: 30, weight: .semibold))
                     .padding(.leading, 40)
@@ -60,7 +61,7 @@ struct MainView: View {
                         .font(.system(size: 20))
                 }
                 .padding()
-                .background(Color.red)
+                .background(Color.redButton)
                 .cornerRadius(30)
                 .buttonStyle(PlainButtonStyle())
                 

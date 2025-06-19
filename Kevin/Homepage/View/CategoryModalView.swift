@@ -57,6 +57,8 @@ struct CategoryModalView: View {
                 Spacer()
                 
                 Button {
+                    if title == "" { return }
+
                     onReady(title.isEmpty ? "Untitled Practice" : title) // Pass the title
                     dismiss()
                 } label: {

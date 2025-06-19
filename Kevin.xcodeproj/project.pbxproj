@@ -31,8 +31,6 @@
 		CBDC3CDD2DF984750051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBDC3D092DFAB4A00051B96A /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 		CBF56FEC2E02A7A200F13383 /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
-		CBF572602E02BCD300F13383 /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
-		CBF573462E02C43600F13383 /* Kevin.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Kevin.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -97,16 +95,6 @@
 			sourceTree = "<group>";
 		};
 		CBF56FF02E02A7A200F13383 /* Products */ = {
-			isa = PBXGroup;
-			name = Products;
-			sourceTree = "<group>";
-		};
-		CBF572642E02BCD300F13383 /* Products */ = {
-			isa = PBXGroup;
-			name = Products;
-			sourceTree = "<group>";
-		};
-		CBF5734A2E02C43600F13383 /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -187,16 +175,8 @@
 					ProjectRef = CBDC3D092DFAB4A00051B96A /* Kevin.xcodeproj */;
 				},
 				{
-					ProductGroup = CBF5734A2E02C43600F13383 /* Products */;
-					ProjectRef = CBF573462E02C43600F13383 /* Kevin.xcodeproj */;
-				},
-				{
 					ProductGroup = CB6F70EA2E01464F00359D05 /* Products */;
 					ProjectRef = CB6F70E62E01464F00359D05 /* Kevin.xcodeproj */;
-				},
-				{
-					ProductGroup = CBF572642E02BCD300F13383 /* Products */;
-					ProjectRef = CBF572602E02BCD300F13383 /* Kevin.xcodeproj */;
 				},
 				{
 					ProductGroup = CBF56FF02E02A7A200F13383 /* Products */;
@@ -383,7 +363,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = UA7H73P97K;
+				DEVELOPMENT_TEAM = CNJ5SCX4VJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -415,7 +395,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = UA7H73P97K;
+				DEVELOPMENT_TEAM = CNJ5SCX4VJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;

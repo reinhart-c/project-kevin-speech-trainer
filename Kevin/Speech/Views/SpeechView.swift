@@ -37,44 +37,48 @@ struct SpeechView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
-            headerView
-            mainContentView
-            statusText
-            controlButtonsView
-            Spacer()
-        }
-        .sheet(item: $confirmationAction) { action in
-            confirmationModal(action: action)
-        }
-        .onAppear {
-            setupView()
-        }
-        .onDisappear {
-            cleanupView()
-        }
-        .onChange(of: speechViewModel.isRecording) { oldValue, newValue in
-            handleRecordingStateChange(oldValue: oldValue, newValue: newValue)
-        }
-        .onChange(of: speechViewModel.lastRecordedVideoURL) { _, newValue in
-            handleVideoURLChange(newValue: newValue)
-        }
-        .onChange(of: prompterViewModel.prompterHasFinished) { oldValue, newValue in
-            handlePrompterFinished(oldValue: oldValue, newValue: newValue)
-        }
-        .onChange(of: speechViewModel.isTranscribing) { oldValue, newValue in
-            handleTranscriptionChange(oldValue: oldValue, newValue: newValue)
-        }
-        .onChange(of: speechViewModel.isAnalyzingEmotion) { _, newValue in
-            handleEmotionAnalysisChange(newValue: newValue)
-        }
-        .sheet(isPresented: $showingTranscriptionView) {
-            TranscriptionView(
-                videoURL: selectedVideoForTranscription,
-                viewModel: speechViewModel
-            )
-            .frame(minWidth: 800, minHeight: 600)
-            .presentationDetents([.large])
+        ZStack {
+            VStack(spacing: 20) {
+                headerView
+                mainContentView
+                Spacer()
+            }
+            .sheet(item: $confirmationAction) { action in
+                confirmationModal(action: action)
+            }
+            .onAppear {
+                setupView()
+            }
+            .onDisappear {
+                cleanupView()
+            }
+            .onChange(of: speechViewModel.isRecording) { oldValue, newValue in
+                handleRecordingStateChange(oldValue: oldValue, newValue: newValue)
+            }
+            .onChange(of: speechViewModel.lastRecordedVideoURL) { _, newValue in
+                handleVideoURLChange(newValue: newValue)
+            }
+            .onChange(of: prompterViewModel.prompterHasFinished) { oldValue, newValue in
+                handlePrompterFinished(oldValue: oldValue, newValue: newValue)
+            }
+            .onChange(of: speechViewModel.isTranscribing) { oldValue, newValue in
+                handleTranscriptionChange(oldValue: oldValue, newValue: newValue)
+            }
+            .onChange(of: speechViewModel.isAnalyzingEmotion) { _, newValue in
+                handleEmotionAnalysisChange(newValue: newValue)
+            }
+            .sheet(isPresented: $showingTranscriptionView) {
+                TranscriptionView(
+                    videoURL: selectedVideoForTranscription,
+                    viewModel: speechViewModel
+                )
+                .frame(minWidth: 800, minHeight: 600)
+                .presentationDetents([.large])
+            }
+            
+            if speechViewModel.isProcessing {
+                LoadingView()
+            }
         }
     }
     
@@ -89,9 +93,7 @@ struct SpeechView: View {
             
             Spacer()
             
-            if showingVideoPlayer {
-                playbackControlButton
-            } else {
+            if !showingVideoPlayer {
                 recordingControlsView
             }
         }
@@ -182,7 +184,7 @@ struct SpeechView: View {
             cameraVideoView
             
             if showingResult {
-                ResultView(viewModel: resultViewModel) {
+                SegmentedResult(viewModel: resultViewModel) {
                     resetToInitialState()
                 }
             } else {
@@ -219,6 +221,7 @@ struct SpeechView: View {
 
             cameraOverlayView
         }
+        .padding(.leading, 40)
     }
     
     private var cameraOverlayView: some View {

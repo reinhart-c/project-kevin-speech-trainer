@@ -45,6 +45,13 @@ internal class SpeechViewModel: NSObject, ObservableObject, AVCaptureFileOutputR
     
     var currentPracticeTitle: String = "Untitled Practice"
     
+    // for loading screen
+    var isProcessing: Bool {
+        (isTranscribing || isAnalyzingEmotion) &&
+        (transcriptionText.isEmpty || emotionResults.isEmpty)
+    }
+
+    
     override init() {
         super.init()
         loadRecordings() // Load existing recordings on init
