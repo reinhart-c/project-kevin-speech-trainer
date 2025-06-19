@@ -14,6 +14,9 @@ struct LoadingView: View {
 
     var body: some View {
         ZStack {
+            Color.white
+                .ignoresSafeArea()
+            
             LottieView(filename: "LoadingPaperPlaneAimation")
                 .frame(width: 800, height: 800)
 

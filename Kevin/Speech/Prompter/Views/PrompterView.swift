@@ -91,6 +91,7 @@ struct PrompterView: View {
             }
         }
         .frame(width: 300)
+        .frame(maxHeight: .infinity)
     }
 }
 
