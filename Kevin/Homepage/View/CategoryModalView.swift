@@ -62,8 +62,8 @@ struct CategoryModalView: View {
                     onReady(title.isEmpty ? "Untitled Practice" : title) // Pass the title
                     dismiss()
                 } label: {
-                    if title == ""{
-                        //disabled
+                    if title == "" {
+                        // disabled
                         Text("I'm Ready")
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -73,8 +73,8 @@ struct CategoryModalView: View {
                             .buttonStyle(PlainButtonStyle())
                             .frame(width: 180)
                             .cornerRadius(999)
-                    }else{
-                        //enabled
+                    } else {
+                        // enabled
                         Text("I'm Ready")
                             .frame(maxWidth: .infinity)
                             .padding()
